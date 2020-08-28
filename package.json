@@ -1,0 +1,10 @@
+{
+  "name": "messengerServer",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Vladislav Donets",
+  "license": "MIT",
+  "dependencies": {
+    "uWebSockets.js": "uNetworking/uWebSockets.js#v18.4.0"
+  }
+}
