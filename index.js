@@ -1,8 +1,19 @@
-const uWS = require('uWebSockets.js')
+import uWS from 'uWebSockets.js'
+import { StringDecoder } from 'string_decoder'
+
+import { getUser, createUser } from './modules/mysql.js'
 
 const port = 9001
-const stringDecoder = new (require('string_decoder').StringDecoder)('utf8')
+const stringDecoder = new StringDecoder('utf8')
 const connected_clients = new Map() // Workaround until PubSub is available
+
+// Send sms
+var accountSid = 'AC64664f594eceb830a09387f980e2a520' // Your Account SID from www.twilio.com/console
+var authToken = '84c349977668be6ed4ec04a6ec4bdf66' // Your Auth Token from www.twilio.com/console
+
+import twilio from 'twilio'
+var client = new twilio(accountSid, authToken)
+// Send sms
 
 uWS
   ./*SSL*/ App()
@@ -46,8 +57,84 @@ uWS
       })
     },
   })
-  .any('/*', (res, req) => {
-    res.end('Nothing to see here!')
+  .get('/*', (res, req) => {
+    getUser(2, (response) => {
+      console.log(response)
+      res
+        .writeHeader('Content-Type', 'application/json')
+        .end(JSON.stringify(response))
+    })
+    res.onAborted(() => {
+      onAbortedOrFinishedResponse(res, readStream)
+    })
+  })
+  .post('/login', (res, req) => {
+    getUser(2, (response) => {
+      console.log(response)
+
+      res
+        .writeHeader('Content-Type', 'application/json')
+        .end(JSON.stringify({ todo: 'Nobody but me' }))
+    })
+
+    res.onAborted(() => {
+      onAbortedOrFinishedResponse(res, readStream)
+    })
+  })
+  .post('/sendCode', (res, req) => {
+    /* Note that you cannot read from req after returning from here */
+    let url = req.getUrl()
+
+    console.log('some data')
+
+    /* Read the body until done or error */
+    readJson(
+      res,
+      (obj) => {
+        console.log('Posted to ' + url + ': ')
+        console.log(obj)
+
+        client.verify
+          .services('VA12d70175f74c38d99328ccee3352a887')
+          .verifications.create({
+            to: obj.phone,
+            channel: 'sms',
+            locale: 'ru',
+          })
+          .then((verification) => console.log(verification.sid))
+          .catch((error) => console.error(error))
+
+        res.end(JSON.stringify({ todo: 'Thanks for this json!' }))
+      },
+      () => {
+        /* Request was prematurely aborted or invalid or missing, stop reading */
+        console.log('Invalid JSON or no data at all!')
+      }
+    )
+  })
+  .post('/register', (res, req) => {
+    const userData = {
+      lastName: 'Vladislav',
+      familyName: 'Donets',
+      birthDate: '15.02.1993',
+      sex: '1',
+      orientation: 'hetero',
+      location: 'Moscow',
+      phone: '+79998009995',
+      email: '123',
+    }
+
+    createUser(userData, (response) => {
+      console.log(response)
+
+      res
+        .writeHeader('Content-Type', 'application/json')
+        .end(JSON.stringify(response))
+    })
+
+    res.onAborted(() => {
+      onAbortedOrFinishedResponse(res, readStream)
+    })
   })
   .listen(port, (token) => {
     if (token) {
@@ -56,6 +143,22 @@ uWS
       console.log('Failed to listen to port ' + port)
     }
   })
+
+/* Either onAborted or simply finished request */
+function onAbortedOrFinishedResponse(res, readStream) {
+  if (res.id == -1) {
+    console.log(
+      'ERROR! onAbortedOrFinishedResponse called twice for the same res!'
+    )
+  } else {
+    console.log('Stream was closed, openStreams: ' + --openStreams)
+    console.timeEnd(res.id)
+    readStream.destroy()
+  }
+
+  /* Mark this response already accounted for */
+  res.id = -1
+}
 
 function remoteAddressToString(address) {
   if (address.byteLength == 4) {
@@ -135,4 +238,44 @@ function create_UUID(a, b) {
         : '-'
   );
   return b
+}
+
+/* Helper function for reading a posted JSON body */
+function readJson(res, cb, err) {
+  let buffer
+  /* Register data cb */
+  res.onData((ab, isLast) => {
+    let chunk = Buffer.from(ab)
+    if (isLast) {
+      let json
+      if (buffer) {
+        try {
+          json = JSON.parse(Buffer.concat([buffer, chunk]))
+        } catch (e) {
+          /* res.close calls onAborted */
+          res.close()
+          return
+        }
+        cb(json)
+      } else {
+        try {
+          json = JSON.parse(chunk)
+        } catch (e) {
+          /* res.close calls onAborted */
+          res.close()
+          return
+        }
+        cb(json)
+      }
+    } else {
+      if (buffer) {
+        buffer = Buffer.concat([buffer, chunk])
+      } else {
+        buffer = Buffer.concat([chunk])
+      }
+    }
+  })
+
+  /* Register error cb */
+  res.onAborted(err)
 }
