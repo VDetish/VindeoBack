@@ -1,7 +1,9 @@
 import uWS from 'uWebSockets.js'
 import { StringDecoder } from 'string_decoder'
 
-import { getUser, createUser } from './modules/mysql.js'
+import { getUser, createUser, addCall, checkCode } from './modules/mysql.js'
+
+import { makeCall } from './modules/PhoneVerification.js'
 
 const port = 9001
 const stringDecoder = new StringDecoder('utf8')
@@ -82,29 +84,44 @@ uWS
     })
   })
   .post('/sendCode', (res, req) => {
-    /* Note that you cannot read from req after returning from here */
-    let url = req.getUrl()
+    let session = req.getHeader('session')
 
-    console.log('some data')
-
-    /* Read the body until done or error */
     readJson(
       res,
       (obj) => {
-        console.log('Posted to ' + url + ': ')
-        console.log(obj)
+        const { phone } = obj
 
-        client.verify
-          .services('VA12d70175f74c38d99328ccee3352a887')
-          .verifications.create({
-            to: obj.phone,
-            channel: 'sms',
-            locale: 'ru',
-          })
-          .then((verification) => console.log(verification.sid))
-          .catch((error) => console.error(error))
+        makeCall(phone, (err, call) => {
+          console.log(err, call)
+          const { error, code } = call
 
-        res.end(JSON.stringify({ todo: 'Thanks for this json!' }))
+          if (error) {
+            res.end(JSON.stringify({ status: false, error }))
+          } else if (code) {
+            addCall({ phone, code, session }, () => {
+              res.end(JSON.stringify({ status: true }))
+            })
+          } else if (err) {
+            res.end(JSON.stringify({ status: false, error: 'unknown' }))
+          }
+        })
+
+        // client.verify
+        //   .services('VA12d70175f74c38d99328ccee3352a887')
+        //   .verifications.create({
+        //     to: obj.phone,
+        //     channel: 'sms',
+        //     locale: 'ru',
+        //   })
+        //   .then((verification) => {
+        //     console.log(verification)
+        //     res.end(JSON.stringify({ status: verification.status }))
+        //   })
+        //   .catch((error) => {
+        //     console.error(error)
+
+        //     res.end(JSON.stringify({ status: error.status }))
+        //   })
       },
       () => {
         /* Request was prematurely aborted or invalid or missing, stop reading */
@@ -112,6 +129,35 @@ uWS
       }
     )
   })
+
+  .post('/checkCode', (res, req) => {
+    let session = req.getHeader('session')
+
+    readJson(
+      res,
+      (obj) => {
+        const { phone, code } = obj
+
+        checkCode({ phone, code, session }, (err, valid) => {
+          if (err) console.log(err)
+          res.end(JSON.stringify({ valid: valid }))
+        })
+
+        // client.verify
+        //   .services('VA12d70175f74c38d99328ccee3352a887')
+        //   .verificationChecks.create({ to: obj.phone, code: obj.code })
+        //   .then((verification_check) => {
+        //     console.log(verification_check)
+        //     res.end(JSON.stringify({ valid: verification_check.valid }))
+        //   })
+      },
+      () => {
+        /* Request was prematurely aborted or invalid or missing, stop reading */
+        console.log('Invalid JSON or no data at all!')
+      }
+    )
+  })
+
   .post('/register', (res, req) => {
     const userData = {
       lastName: 'Vladislav',

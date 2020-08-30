@@ -89,8 +89,47 @@ export function createUser(
       callback
     )
   } catch (e) {
-    console.log(e)
     callback(e)
+  }
+}
+
+// Add Call
+export function addCall({ phone, session, code }, callback) {
+  try {
+    connection.query(
+      'INSERT INTO `calls` SET ?',
+      {
+        phone,
+        code,
+        session,
+      },
+      callback
+    )
+  } catch (e) {
+    callback(e)
+  }
+}
+
+// Check Code
+export function checkCode({ phone, session, code }, callback) {
+  try {
+    // Добавить проверку даты добавления кода, чтобы не проверять старые
+    const sql = connection.format(
+      'UPDATE calls SET validated = ? WHERE ? AND ? AND ? AND ?',
+      [1, { phone }, { code }, { session }, { validated: false }]
+    )
+
+    connection.query(sql, (err, res) => {
+      if (err) {
+        callback(err, false)
+      } else if (res.changedRows === 1) {
+        callback(null, true)
+      } else {
+        callback(null, false)
+      }
+    })
+  } catch (e) {
+    callback(e, false)
   }
 }
 
