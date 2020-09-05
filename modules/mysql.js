@@ -1,11 +1,43 @@
-import mysql from 'mysql2'
+import mysql from 'mysql2/promise.js'
 
-const connection = mysql.createConnection({
+const connection = await mysql.createConnection({
   host: 'localhost',
   user: 'root',
   password: 'tool46',
   database: 'toolmi',
 })
+
+export async function createSession(fields) {
+  const query = await connection.query('INSERT INTO `sessions` SET ?', fields)
+
+  return !!query[1]
+}
+
+export async function getSession(value) {
+  const query = await connection.query('SELECT * FROM `sessions` WHERE ?', {
+    value,
+  })
+
+  return query[0].length > 0
+}
+
+export async function addDevice(session, json) {
+  const fields = {
+    device: json.device,
+    platform: json.platform,
+    platform_version: json.platformVersion,
+    app_version: json.appVersion,
+    session,
+  }
+
+  try {
+    const query = await connection.query('INSERT INTO `devices` SET ?', fields)
+    return [!!query[1], session]
+  } catch (e) {
+    // console.log(e)
+    return [true, session]
+  }
+}
 
 // // Add user
 // exports.addUser = (id, callback) => {

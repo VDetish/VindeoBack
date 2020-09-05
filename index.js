@@ -5,6 +5,8 @@ import { getUser, createUser, addCall, checkCode } from './modules/mysql.js'
 
 import { makeCall } from './modules/PhoneVerification.js'
 
+import device from './Router/device/index.js'
+
 const port = 9001
 const stringDecoder = new StringDecoder('utf8')
 const connected_clients = new Map() // Workaround until PubSub is available
@@ -14,6 +16,7 @@ var accountSid = 'AC64664f594eceb830a09387f980e2a520' // Your Account SID from w
 var authToken = '84c349977668be6ed4ec04a6ec4bdf66' // Your Auth Token from www.twilio.com/console
 
 import twilio from 'twilio'
+
 var client = new twilio(accountSid, authToken)
 // Send sms
 
@@ -59,17 +62,7 @@ uWS
       })
     },
   })
-  .get('/*', (res, req) => {
-    getUser(2, (response) => {
-      console.log(response)
-      res
-        .writeHeader('Content-Type', 'application/json')
-        .end(JSON.stringify(response))
-    })
-    res.onAborted(() => {
-      onAbortedOrFinishedResponse(res, readStream)
-    })
-  })
+  .post('/device', device)
   .post('/login', (res, req) => {
     getUser(2, (response) => {
       console.log(response)
@@ -204,31 +197,6 @@ function onAbortedOrFinishedResponse(res, readStream) {
 
   /* Mark this response already accounted for */
   res.id = -1
-}
-
-function remoteAddressToString(address) {
-  if (address.byteLength == 4) {
-    //IPv4
-    return new Uint8Array(address).join('.')
-  } else if (address.byteLength == 16) {
-    //IPv6
-    let arr = Array.from(new Uint16Array(address))
-    if (
-      arr[0] == 0 &&
-      arr[1] == 0 &&
-      arr[2] == 0 &&
-      arr[3] == 0 &&
-      arr[4] == 0 &&
-      arr[5] == 0xffff
-    )
-      //IPv4 mapped to IPv6
-      return new Uint8Array(address.slice(12)).join('.')
-    else
-      return Array.from(new Uint16Array(address))
-        .map((v) => v.toString(16))
-        .join(':')
-        .replace(/((^|:)(0(:|$))+)/, '::')
-  }
 }
 
 function handleMessage(ws, message) {
