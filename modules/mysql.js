@@ -30,8 +30,17 @@ export async function addDevice(session, json) {
     session,
   }
 
+  const fieldsUpdate = {
+    platform_version: json.platformVersion,
+    app_version: json.appVersion,
+  }
+
   try {
-    const query = await connection.query('INSERT INTO `devices` SET ?', fields)
+    const query = await connection.query(
+      'INSERT INTO `devices` SET ? ON DUPLICATE KEY UPDATE ?',
+      [fields, fieldsUpdate]
+    )
+
     return [!!query[1], session]
   } catch (e) {
     // console.log(e)

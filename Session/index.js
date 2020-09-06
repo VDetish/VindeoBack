@@ -12,7 +12,7 @@ export default async function (res, req) {
 
   let isError = false
 
-  if (session === 'undefined') {
+  if (session === 'undefined' || session === 'null') {
     session = crypto.randomBytes(16).toString('hex')
 
     isError = await createSession({ value: session, ip })
