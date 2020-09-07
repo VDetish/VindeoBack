@@ -12,7 +12,7 @@ export function query(resource, { method, body }, callback) {
       const json = res.body.toString()
       const response = JSON.parse(json)
 
-      callback(null, { ...response, ...{ error: null } })
+      callback(response.error_code, { ...response, ...{ error: null } })
     }
   })
 }

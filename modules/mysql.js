@@ -43,8 +43,41 @@ export async function addDevice(session, json) {
 
     return [!!query[1], session]
   } catch (e) {
-    // console.log(e)
     return [true, session]
+  }
+}
+
+export async function addCall(fields) {
+  const fieldsUpdate = { ...fields, fails: 0, validated: 0 }
+
+  const query = await connection.query(
+    'INSERT INTO `calls` SET ? ON DUPLICATE KEY UPDATE ?',
+    [fields, fieldsUpdate]
+  )
+
+  return { status: !query[1] }
+}
+
+export async function checkCode({ phone, session, code }) {
+  const [
+    res,
+    err,
+  ] = await connection.query(
+    'UPDATE calls SET validated = ? WHERE ? AND ? AND ? AND ? AND fails < 3',
+    [1, { phone }, { code }, { session }, { validated: false }]
+  )
+
+  if (err) {
+    return false
+  } else if (res.changedRows === 1) {
+    return true
+  } else {
+    await connection.query(
+      'UPDATE calls SET fails = fails + 1 WHERE ? AND ? AND ?',
+      [{ phone }, { session }, { validated: false }]
+    )
+
+    return false
   }
 }
 
@@ -104,7 +137,6 @@ export function getUser(id, callback) {
   try {
     connection.query('SELECT * FROM `users` WHERE ?', { id }, callback)
   } catch (e) {
-    console.log(e)
     callback(e)
   }
 }
@@ -131,46 +163,6 @@ export function createUser(
     )
   } catch (e) {
     callback(e)
-  }
-}
-
-// Add Call
-export function addCall({ phone, session, code }, callback) {
-  try {
-    connection.query(
-      'INSERT INTO `calls` SET ?',
-      {
-        phone,
-        code,
-        session,
-      },
-      callback
-    )
-  } catch (e) {
-    callback(e)
-  }
-}
-
-// Check Code
-export function checkCode({ phone, session, code }, callback) {
-  try {
-    // Добавить проверку даты добавления кода, чтобы не проверять старые
-    const sql = connection.format(
-      'UPDATE calls SET validated = ? WHERE ? AND ? AND ? AND ?',
-      [1, { phone }, { code }, { session }, { validated: false }]
-    )
-
-    connection.query(sql, (err, res) => {
-      if (err) {
-        callback(err, false)
-      } else if (res.changedRows === 1) {
-        callback(null, true)
-      } else {
-        callback(null, false)
-      }
-    })
-  } catch (e) {
-    callback(e, false)
   }
 }
 

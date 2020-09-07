@@ -33,8 +33,6 @@ export async function readJson(res) {
 }
 
 export function sendJson(res, { session, json }) {
-  console.log(session, json)
-
   res
     .writeHeader('Content-Type', 'application/json')
     .writeHeader('session', session)

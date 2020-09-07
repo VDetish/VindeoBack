@@ -1,11 +1,11 @@
 import uWS from 'uWebSockets.js'
 import { StringDecoder } from 'string_decoder'
 
-import { getUser, createUser, addCall, checkCode } from './modules/mysql.js'
-
-import { makeCall } from './modules/PhoneVerification.js'
+import { getUser, createUser } from './modules/mysql.js'
 
 import device from './Router/device/index.js'
+import sendCode from './Router/code/send/index.js'
+import checkCode from './Router/code/check/index.js'
 
 const port = 9001
 const stringDecoder = new StringDecoder('utf8')
@@ -63,6 +63,8 @@ uWS
     },
   })
   .post('/device', device)
+  .post('/sendCode', sendCode)
+  .post('/checkCode', checkCode)
   .post('/login', (res, req) => {
     getUser(2, (response) => {
       console.log(response)
@@ -76,81 +78,6 @@ uWS
       onAbortedOrFinishedResponse(res, readStream)
     })
   })
-  .post('/sendCode', (res, req) => {
-    let session = req.getHeader('session')
-
-    readJson(
-      res,
-      (obj) => {
-        const { phone } = obj
-
-        makeCall(phone, (err, call) => {
-          console.log(err, call)
-          const { error, code } = call
-
-          if (error) {
-            res.end(JSON.stringify({ status: false, error }))
-          } else if (code) {
-            addCall({ phone, code, session }, () => {
-              res.end(JSON.stringify({ status: true }))
-            })
-          } else if (err) {
-            res.end(JSON.stringify({ status: false, error: 'unknown' }))
-          }
-        })
-
-        // client.verify
-        //   .services('VA12d70175f74c38d99328ccee3352a887')
-        //   .verifications.create({
-        //     to: obj.phone,
-        //     channel: 'sms',
-        //     locale: 'ru',
-        //   })
-        //   .then((verification) => {
-        //     console.log(verification)
-        //     res.end(JSON.stringify({ status: verification.status }))
-        //   })
-        //   .catch((error) => {
-        //     console.error(error)
-
-        //     res.end(JSON.stringify({ status: error.status }))
-        //   })
-      },
-      () => {
-        /* Request was prematurely aborted or invalid or missing, stop reading */
-        console.log('Invalid JSON or no data at all!')
-      }
-    )
-  })
-
-  .post('/checkCode', (res, req) => {
-    let session = req.getHeader('session')
-
-    readJson(
-      res,
-      (obj) => {
-        const { phone, code } = obj
-
-        checkCode({ phone, code, session }, (err, valid) => {
-          if (err) console.log(err)
-          res.end(JSON.stringify({ valid: valid }))
-        })
-
-        // client.verify
-        //   .services('VA12d70175f74c38d99328ccee3352a887')
-        //   .verificationChecks.create({ to: obj.phone, code: obj.code })
-        //   .then((verification_check) => {
-        //     console.log(verification_check)
-        //     res.end(JSON.stringify({ valid: verification_check.valid }))
-        //   })
-      },
-      () => {
-        /* Request was prematurely aborted or invalid or missing, stop reading */
-        console.log('Invalid JSON or no data at all!')
-      }
-    )
-  })
-
   .post('/register', (res, req) => {
     const userData = {
       lastName: 'Vladislav',
