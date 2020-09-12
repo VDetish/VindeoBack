@@ -6,6 +6,8 @@ import { getUser, createUser } from './modules/mysql.js'
 import device from './Router/device/index.js'
 import sendCode from './Router/code/send/index.js'
 import checkCode from './Router/code/check/index.js'
+import removeUser from './Router/user/remove/index.js'
+import setUserInfo from './Router/user/setInfo/index.js'
 
 const port = 9001
 const stringDecoder = new StringDecoder('utf8')
@@ -65,6 +67,8 @@ uWS
   .post('/device', device)
   .post('/sendCode', sendCode)
   .post('/checkCode', checkCode)
+  .post('/removeUser', removeUser)
+  .post('/setUserInfo', setUserInfo)
   .post('/login', (res, req) => {
     getUser(2, (response) => {
       console.log(response)

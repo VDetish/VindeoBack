@@ -81,20 +81,68 @@ export async function checkCode({ phone, session, code }) {
   }
 }
 
-// // Add user
-// exports.addUser = (id, callback) => {
-//   connection.query(
-//     'INSERT INTO `users` SET ?',
-//     {
-//       firstName: 'test',
-//       lastName: 'test',
-//       vID: 666,
-//       canWrite: true,
-//       canGetAudio: false,
-//     },
-//     callback
-//   )
-// }
+export async function createUser(session, phone) {
+  const [res, err] = await connection.query('INSERT INTO `users` SET ?', {
+    phone,
+  })
+
+  const user = await getUser(res.insertId)
+
+  await updateSession(session, user.id)
+
+  return user
+}
+
+export async function getUser(id) {
+  const [res, err] = await connection.query('SELECT * FROM `users` WHERE ?', {
+    id,
+  })
+
+  return res[0]
+}
+
+export async function updateSession(value, user) {
+  await connection.query('UPDATE sessions SET user = ? WHERE ?', [
+    user,
+    { value },
+  ])
+}
+
+export async function removeUser(session) {
+  const userData = await getSessionUser(session)
+
+  await connection.query(
+    mysql.format('DELETE FROM users WHERE ?', [{ id: userData.user }])
+  )
+  await connection.query('UPDATE sessions SET user = 0 WHERE ?', [
+    { value: session },
+  ])
+
+  return true
+}
+
+export async function getSessionUser(session) {
+  const query = await connection.query('SELECT * FROM `sessions` WHERE ?', {
+    value: session,
+  })
+
+  return query[0][0]
+}
+
+export async function setUserInfo({ name, family_name, sex }, session) {
+  const userData = await getSessionUser(session)
+
+  const sql = mysql.format(
+    'UPDATE users SET name = ?, family_name = ?, sex = ? WHERE ?',
+    [name, family_name, sex, { id: userData.user }]
+  )
+
+  console.log(sql)
+
+  await connection.query(sql)
+
+  return true
+}
 
 // // Add media
 // exports.addMedia = (media, callback) => {
@@ -131,40 +179,6 @@ export async function checkCode({ phone, session, code }) {
 //     callback
 //   )
 // }
-
-// Get user
-export function getUser(id, callback) {
-  try {
-    connection.query('SELECT * FROM `users` WHERE ?', { id }, callback)
-  } catch (e) {
-    callback(e)
-  }
-}
-
-// Create user
-export function createUser(
-  { lastName, familyName, birthDate, sex, orientation, location, phone, email },
-  callback
-) {
-  try {
-    connection.query(
-      'INSERT INTO `users` SET ?',
-      {
-        lastName,
-        familyName,
-        birthDate,
-        sex,
-        orientation,
-        location,
-        phone,
-        email,
-      },
-      callback
-    )
-  } catch (e) {
-    callback(e)
-  }
-}
 
 // // Update connection
 // exports.userIsGet = (id, callback) => {
