@@ -132,14 +132,21 @@ export async function getSessionUser(session) {
 export async function setUserInfo({ name, family_name, sex }, session) {
   const userData = await getSessionUser(session)
 
-  const sql = mysql.format(
+  await connection.query(
     'UPDATE users SET name = ?, family_name = ?, sex = ? WHERE ?',
     [name, family_name, sex, { id: userData.user }]
   )
 
-  console.log(sql)
+  return true
+}
 
-  await connection.query(sql)
+export async function setUserEmail({ email }, session) {
+  const userData = await getSessionUser(session)
+
+  await connection.query('UPDATE users SET email = ? WHERE ?', [
+    email,
+    { id: userData.user },
+  ])
 
   return true
 }
