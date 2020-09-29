@@ -151,6 +151,17 @@ export async function setUserEmail({ email }, session) {
   return true
 }
 
+export async function setAge({ birth_date }, session) {
+  const userData = await getSessionUser(session)
+
+  await connection.query('UPDATE users SET birth_date = ? WHERE ?', [
+    birth_date,
+    { id: userData.user },
+  ])
+
+  return true
+}
+
 // // Add media
 // exports.addMedia = (media, callback) => {
 //   connection.query(
