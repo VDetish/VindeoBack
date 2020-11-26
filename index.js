@@ -1,5 +1,8 @@
 import uWS from 'uWebSockets.js'
 import { StringDecoder } from 'string_decoder'
+import fs from 'fs'
+import path from 'path'
+import Busboy from 'busboy'
 
 import { getUser, createUser } from './modules/mysql.js'
 
@@ -117,24 +120,39 @@ uWS
     })
   })
   .post('/uploadPhoto', (res, req) => {
-    console.log('Posted to ' + req.getUrl())
-    res.onData((chunk, isLast) => {
-      /* Buffer this anywhere you want to */
-      console.log(
-        'Got chunk of data with length ' +
-          chunk.byteLength +
-          ', isLast: ' +
-          isLast
-      )
+    const headers = {}
+    req.forEach((k, v) => {
+      headers[k] = v
+    })
 
-      /* We respond when we are done */
+    var busboy = new Busboy({ headers: headers })
+
+    busboy.on('file', function (fieldname, file, filename) {
+      let fName = guidGenerator() + filename.split('.').pop()
+      var saveTo = path.join(path.resolve('./temp/'), path.basename(fName))
+      file.pipe(fs.createWriteStream(saveTo))
+    })
+
+    busboy.on('field', function (fieldname, val) {
+      console.log('Field [' + fieldname + ']: value: ' + val)
+    })
+
+    busboy.on('finish', function () {
+      res.writeStatus('202 Accepted')
+      res.end("That's all folks!")
+    })
+
+    let data = Buffer.allocUnsafe(0)
+
+    res.onData((chunk, isLast) => {
+      data = Buffer.concat([data, Buffer.from(chunk)])
+
       if (isLast) {
-        res.end('Thanks for the data!')
+        busboy.end(data)
       }
     })
 
     res.onAborted(() => {
-      /* Request was prematurely aborted, stop reading */
       console.log('Eh, okay. Thanks for nothing!')
     })
   })
@@ -255,4 +273,11 @@ function readJson(res, cb, err) {
 
   /* Register error cb */
   res.onAborted(err)
+}
+
+function guidGenerator() {
+  var S4 = function () {
+    return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1)
+  }
+  return `${S4()}${S4()}-${S4()}.`
 }
