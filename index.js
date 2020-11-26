@@ -9,6 +9,7 @@ import checkCode from './Router/code/check/index.js'
 import removeUser from './Router/user/remove/index.js'
 import setUserInfo from './Router/user/setInfo/index.js'
 import setUserEmail from './Router/user/setEmail/index.js'
+import setUserAge from './Router/user/setAge/index.js'
 
 const port = 9001
 const stringDecoder = new StringDecoder('utf8')
@@ -71,6 +72,7 @@ uWS
   .post('/removeUser', removeUser)
   .post('/setUserInfo', setUserInfo)
   .post('/setUserEmail', setUserEmail)
+  .post('/setUserAge', setUserAge)
   .post('/login', (res, req) => {
     getUser(2, (response) => {
       console.log(response)
@@ -103,6 +105,17 @@ uWS
         .writeHeader('Content-Type', 'application/json')
         .end(JSON.stringify(response))
     })
+
+    res.onAborted(() => {
+      onAbortedOrFinishedResponse(res, readStream)
+    })
+  })
+  .post('/uploadPhoto', (res, req) => {
+    console.log('uploadPhoto')
+
+    res
+      .writeHeader('Content-Type', 'application/json')
+      .end(JSON.stringify(response))
 
     res.onAborted(() => {
       onAbortedOrFinishedResponse(res, readStream)
