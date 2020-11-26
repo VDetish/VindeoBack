@@ -117,14 +117,25 @@ uWS
     })
   })
   .post('/uploadPhoto', (res, req) => {
-    console.log('uploadPhoto')
+    console.log('Posted to ' + req.getUrl())
+    res.onData((chunk, isLast) => {
+      /* Buffer this anywhere you want to */
+      console.log(
+        'Got chunk of data with length ' +
+          chunk.byteLength +
+          ', isLast: ' +
+          isLast
+      )
 
-    res
-      .writeHeader('Content-Type', 'application/json')
-      .end(JSON.stringify(response))
+      /* We respond when we are done */
+      if (isLast) {
+        res.end('Thanks for the data!')
+      }
+    })
 
     res.onAborted(() => {
-      onAbortedOrFinishedResponse(res, readStream)
+      /* Request was prematurely aborted, stop reading */
+      console.log('Eh, okay. Thanks for nothing!')
     })
   })
   .listen(port, (token) => {
