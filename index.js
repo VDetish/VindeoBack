@@ -70,6 +70,12 @@ uWS
   .post('/sendCode', sendCode)
   .post('/checkCode', checkCode)
   .post('/removeUser', removeUser)
+  .get('/*', (res, req) => {
+    res
+      .writeStatus('200 OK')
+      .writeHeader('IsExample', 'Yes')
+      .end('Hello there!')
+  })
   .post('/setUserInfo', setUserInfo)
   .post('/setUserEmail', setUserEmail)
   .post('/setUserAge', setUserAge)
