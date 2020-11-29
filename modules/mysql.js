@@ -162,6 +162,14 @@ export async function setAge({ birth_date }, session) {
   return true
 }
 
+export async function addPhoto(fields, session) {
+  const userData = await getSessionUser(session)
+  fields.user = userData.user
+  const query = await connection.query('INSERT INTO `photos` SET ?', fields)
+
+  return query
+}
+
 // // Add media
 // exports.addMedia = (media, callback) => {
 //   connection.query(
