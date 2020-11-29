@@ -10,7 +10,8 @@ import removeUser from './Router/user/remove/index.js'
 import setUserInfo from './Router/user/setInfo/index.js'
 import setUserEmail from './Router/user/setEmail/index.js'
 import setUserAge from './Router/user/setAge/index.js'
-import uploadPhoto from './Router/user/savePhoto/index.js'
+import addPhoto from './Router/user/photo/add/index.js'
+import getPhotos from './Router/user/photo/get/index.js'
 
 const port = 9001
 const stringDecoder = new StringDecoder('utf8')
@@ -117,7 +118,8 @@ uWS
       onAbortedOrFinishedResponse(res, readStream)
     })
   })
-  .post('/uploadPhoto', uploadPhoto)
+  .post('/uploadPhoto', addPhoto)
+  .get('/photos', getPhotos)
   .listen(port, (token) => {
     if (token) {
       console.log('Listening to port ' + port)

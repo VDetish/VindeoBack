@@ -170,6 +170,18 @@ export async function addPhoto(fields, session) {
   return query
 }
 
+export async function getPhotos(session) {
+  const { user } = await getSessionUser(session)
+
+  const query = await connection.query('SELECT * FROM `photos` WHERE ?', {
+    user,
+  })
+
+  console.log(query)
+
+  return query[0][0]
+}
+
 // // Add media
 // exports.addMedia = (media, callback) => {
 //   connection.query(
