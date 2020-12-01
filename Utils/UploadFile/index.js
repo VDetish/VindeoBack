@@ -26,7 +26,6 @@ function sFile({ res, req }, cb, err) {
 
   busboy.on('field', function (fieldname, val) {
     sort = val
-    console.log('Field [' + fieldname + ']: value: ' + val)
   })
 
   busboy.on('finish', function () {

@@ -177,9 +177,18 @@ export async function getPhotos(session) {
     user,
   })
 
-  console.log(query)
+  return query[0]
+}
 
-  return query[0][0]
+export async function deletePhoto({ sort }, session) {
+  const { user } = await getSessionUser(session)
+
+  const query = await connection.query('DELETE FROM photos WHERE ? AND ?', [
+    { user },
+    { sort },
+  ])
+
+  return !!query[1]
 }
 
 // // Add media

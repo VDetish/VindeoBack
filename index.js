@@ -1,5 +1,6 @@
 import uWS from 'uWebSockets.js'
 import { StringDecoder } from 'string_decoder'
+import fs from 'fs'
 
 import { getUser, createUser } from './modules/mysql.js'
 
@@ -12,6 +13,7 @@ import setUserEmail from './Router/user/setEmail/index.js'
 import setUserAge from './Router/user/setAge/index.js'
 import addPhoto from './Router/user/photo/add/index.js'
 import getPhotos from './Router/user/photo/get/index.js'
+import removePhoto from './Router/user/photo/remove/index.js'
 
 const port = 9001
 const stringDecoder = new StringDecoder('utf8')
@@ -120,6 +122,19 @@ uWS
   })
   .post('/uploadPhoto', addPhoto)
   .get('/photos', getPhotos)
+  .get('/photos/get/:name', (res, req) => {
+    let name = req.getParameter(0)
+
+    let file = fs.readFileSync(`./temp/${name}`, function (err, data) {
+      if (err) {
+        res.end(`Error getting the file: ${err}.`)
+      } else {
+        res.writeHeader('Content-Type', 'image/jpeg').end(data)
+      }
+    })
+    res.writeHeader('Content-Type', 'image/jpeg').end(file)
+  })
+  .post('/removePhoto', removePhoto)
   .listen(port, (token) => {
     if (token) {
       console.log('Listening to port ' + port)

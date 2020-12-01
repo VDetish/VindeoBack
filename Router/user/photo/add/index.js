@@ -15,8 +15,6 @@ export default async function (res, req) {
       return addPhoto(file, session)
     })
     .then((status) => {
-      console.log(status)
-
       sendJson(res, { session: tempSession, json: { status } })
     })
 }
