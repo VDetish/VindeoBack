@@ -151,6 +151,17 @@ export async function setUserEmail({ email }, session) {
   return true
 }
 
+export async function setUserOrientation({ orientation }, session) {
+  const userData = await getSessionUser(session)
+
+  await connection.query('UPDATE users SET orientation = ? WHERE ?', [
+    orientation,
+    { id: userData.user },
+  ])
+
+  return true
+}
+
 export async function setAge({ birth_date }, session) {
   const userData = await getSessionUser(session)
 

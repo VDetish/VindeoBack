@@ -11,6 +11,7 @@ import removeUser from './Router/user/remove/index.js'
 import setUserInfo from './Router/user/setInfo/index.js'
 import setUserEmail from './Router/user/setEmail/index.js'
 import setUserAge from './Router/user/setAge/index.js'
+import setUserOrientation from './Router/user/setOrientation/index.js'
 import addPhoto from './Router/user/photo/add/index.js'
 import getPhotos from './Router/user/photo/get/index.js'
 import removePhoto from './Router/user/photo/remove/index.js'
@@ -83,6 +84,7 @@ uWS
   .post('/setUserInfo', setUserInfo)
   .post('/setUserEmail', setUserEmail)
   .post('/setUserAge', setUserAge)
+  .post('/setUserOrientation', setUserOrientation)
   .post('/login', (res, req) => {
     getUser(2, (response) => {
       console.log(response)
