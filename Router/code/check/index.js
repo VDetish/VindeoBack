@@ -23,7 +23,7 @@ export default async function (res, req) {
         return createUser(tempSession, tempPhone)
       }
     })
-    .then((user) => {
-      sendJson(res, { session: tempSession, json: { valid: true } })
+    .then((valid) => {
+      sendJson(res, { session: tempSession, json: { valid } })
     })
 }

@@ -82,15 +82,23 @@ export async function checkCode({ phone, session, code }) {
 }
 
 export async function createUser(session, phone) {
-  const [res, err] = await connection.query('INSERT INTO `users` SET ?', {
-    phone,
-  })
+  const userData = await getSessionUser(session)
 
-  const user = await getUser(res.insertId)
+  if (userData.user > 0) {
+    const user = await getUser(userData.user)
+    await updateSession(session, user.id)
 
-  await updateSession(session, user.id)
+    return user
+  } else {
+    const [res, err] = await connection.query('INSERT INTO `users` SET ?', {
+      phone,
+    })
 
-  return user
+    const user = await getUser(res.insertId)
+    await updateSession(session, user.id)
+
+    return user
+  }
 }
 
 export async function getUser(id) {
