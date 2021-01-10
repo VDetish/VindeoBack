@@ -16,6 +16,8 @@ import addPhoto from './Router/user/photo/add/index.js'
 import getPhotos from './Router/user/photo/get/index.js'
 import removePhoto from './Router/user/photo/remove/index.js'
 
+import getRecommendations from './Router/recommendations/get/all/index.js'
+
 const port = 9001
 const stringDecoder = new StringDecoder('utf8')
 const connected_clients = new Map() // Workaround until PubSub is available
@@ -124,6 +126,7 @@ uWS
   })
   .post('/uploadPhoto', addPhoto)
   .get('/photos', getPhotos)
+  .get('/recommendations', getRecommendations)
   .get('/photos/get/:name', (res, req) => {
     let name = req.getParameter(0)
 

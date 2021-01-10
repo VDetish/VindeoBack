@@ -210,72 +210,16 @@ export async function deletePhoto({ sort }, session) {
   return !!query[1]
 }
 
-// // Add media
-// exports.addMedia = (media, callback) => {
-//   connection.query(
-//     'insert ignore into instagram_media (mediaID, userName, likeCount, commentCount, caption, webLink, image, lat, lng, city, place, address, takenAt, added) values ?',
-//     [media],
-//     callback
-//   )
-// }
+export async function getArtists(session) {
+  const { user } = await getSessionUser(session)
 
-// // Add to queue
-// exports.addToQueue = (queue, callback) => {
-//   connection.query(
-//     'insert ignore into instagram_queue (type, value, added) values ?',
-//     [queue],
-//     callback
-//   )
-// }
+  // Get what user like ordered by rate
+  const query = await connection.query(
+    'SELECT * FROM `users_artists` WHERE ? ORDER BY rate DESC',
+    {
+      user,
+    }
+  )
 
-// // Get queue
-// exports.getQueue = (callback) => {
-//   connection.query(
-//     'select type, value from instagram_queue WHERE ? order by id LIMIT 1',
-//     { isCompleted: 0 },
-//     callback
-//   )
-// }
-
-// // Update queue
-// exports.updateQueue = (value, callback) => {
-//   connection.query(
-//     'update instagram_queue SET isCompleted = ?, completedAt = ? WHERE value = ?',
-//     [1, new Date(), value],
-//     callback
-//   )
-// }
-
-// // Update connection
-// exports.userIsGet = (id, callback) => {
-//   connection.query(
-//     'UPDATE connections SET isGet = ? WHERE value = ?',
-//     [1, id],
-//     callback
-//   )
-// }
-
-// // Get connection
-// exports.getConnection = (callback) => {
-//   connection.query(
-//     'SELECT value FROM connections WHERE ? LIMIT 1',
-//     { isGet: 0 },
-//     callback
-//   )
-// }
-
-// exports.test = (data, callback) => {
-//   connection.query(
-//     'insert ignore into users (vID, firstName, lastName, photo, sex, canWrite, canGetAudio, lastSeen, bdate, city, country, followers) values ?',
-//     [data],
-//     callback
-//   )
-// }
-
-// exports.addConnections = (data, callback) => {
-//   connection.query(
-//     'insert ignore into connections (type, value, userID) values ?',
-//     [data],
-//     callback
-//   )
-// }
+  return query[0]
+}
