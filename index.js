@@ -17,6 +17,8 @@ import getPhotos from './Router/user/photo/get/index.js'
 import removePhoto from './Router/user/photo/remove/index.js'
 
 import getRecommendations from './Router/recommendations/get/all/index.js'
+import getTopGenres from './Router/data/topGenres/index.js'
+import similarGenres from './Router/data/similarGenre/index.js'
 
 const port = 9001
 const stringDecoder = new StringDecoder('utf8')
@@ -127,6 +129,8 @@ uWS
   .post('/uploadPhoto', addPhoto)
   .get('/photos', getPhotos)
   .get('/recommendations', getRecommendations)
+  .get('/topGenres', getTopGenres)
+  .get('/similarGenres/:genre', similarGenres)
   .get('/photos/get/:name', (res, req) => {
     let name = req.getParameter(0)
 
