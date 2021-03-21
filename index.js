@@ -18,7 +18,8 @@ import removePhoto from './Router/user/photo/remove/index.js'
 
 import getRecommendations from './Router/recommendations/get/all/index.js'
 import getTopGenres from './Router/data/topGenres/index.js'
-import similarGenres from './Router/data/similarGenre/index.js'
+import addInterest from './Router/user/interest/add/index.js'
+import getCover from './Router/data/artistCover/index.js'
 
 const port = 9001
 const stringDecoder = new StringDecoder('utf8')
@@ -130,7 +131,6 @@ uWS
   .get('/photos', getPhotos)
   .get('/recommendations', getRecommendations)
   .get('/topGenres', getTopGenres)
-  .get('/similarGenres/:genre', similarGenres)
   .get('/photos/get/:name', (res, req) => {
     let name = req.getParameter(0)
 
@@ -143,7 +143,9 @@ uWS
     })
     res.writeHeader('Content-Type', 'image/jpeg').end(file)
   })
+  .get('/artist/cover/:name', getCover)
   .post('/removePhoto', removePhoto)
+  .post('/addInterest', addInterest)
   .listen(port, (token) => {
     if (token) {
       console.log('Listening to port ' + port)

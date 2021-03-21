@@ -18,9 +18,12 @@ export default async function (res, req) {
 
   tag.sort((a, b) => b.reach - a.reach)
 
-  sendJson(res, { json: { tag } })
+  const newTag = tag.map((obj) => ({ name: obj.name, count: 1 }))
+
+  sendJson(res, { json: { tag: newTag } })
 }
 
+// Cache data!
 export async function getTags() {
   return new Promise((resolve, reject) => {
     query(

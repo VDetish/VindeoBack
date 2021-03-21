@@ -20,10 +20,16 @@ export default async function (res, req) {
     })
     .then((valid) => {
       if (valid) {
-        return createUser(tempSession, tempPhone)
+        sendJson(res, { session: tempSession, json: { valid } })
       }
     })
-    .then((valid) => {
-      sendJson(res, { session: tempSession, json: { valid } })
-    })
+
+  // .then((valid) => {
+  //   if (valid) {
+  //     return createUser(tempSession, tempPhone)
+  //   }
+  // })
+  // .then((valid) => {
+  //   sendJson(res, { session: tempSession, json: { valid } })
+  // })
 }

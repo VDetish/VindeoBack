@@ -1,21 +1,10 @@
 import { query } from '../../../Network/Fetch/index.js'
-import { sendJson } from '../../../Utils/index.js'
 
-import { checkCode, createUser } from '../../../modules/mysql.js'
+const stopList = ['seen live', 'All', 'Listen To This']
 
-export default async function (res, req) {
-  res.onAborted(() => {
-    res.aborted = true
-  })
-
-  let genre = req.getParameter(0)
-
+export default async function (genre) {
   const tags = []
 
-  // Check tags from db
-  // Get tags (genres) from last.fm
-  // Save to db
-  // Return to user
   const {
     topartists: { artist },
   } = await getTags(genre)
@@ -23,17 +12,22 @@ export default async function (res, req) {
   const artists = artist.splice(0, 10)
 
   for (const e of artists) {
+    console.log(e)
+
     const {
       toptags: { tag },
     } = await getArtistTags(e.name)
 
     const t_tags = tag.splice(0, 5)
 
-    t_tags.forEach((e_) => {
+    t_tags.forEach((e_, i) => {
       const temp = tags.find((tag_t) => distance(tag_t.name, e_.name) > 0.8)
 
       if (!temp) {
+        const isStop = stopList.find((a) => a === e_.name)
+
         if (
+          !isStop &&
           distance(e.name, e_.name) < 0.9 &&
           // distance('seen live', e_.name) < 0.9 &&
           distance(genre, e_.name) < 0.9
@@ -49,11 +43,12 @@ export default async function (res, req) {
     })
   }
 
-  tags.sort((a, b) => b.count - a.count)
+  tags.sort((a, b) => b.count - a.count).splice(0, 5)
 
-  sendJson(res, { json: { tags: tags.splice(0, 5) } })
+  return tags.map((a, i) => ({ ...a, count: tags.length - i }))
 }
 
+// Cache results!
 async function getTags(genre) {
   return new Promise((resolve, reject) => {
     query(

@@ -223,3 +223,19 @@ export async function getArtists(session) {
 
   return query[0]
 }
+
+export async function addInterest(fields, session) {
+  const userData = await getSessionUser(session)
+  fields.user = userData.user
+
+  try {
+    const query = await connection.query(
+      'INSERT INTO `users_interests` SET ?',
+      fields
+    )
+
+    return !query[1]
+  } catch (e) {
+    return false
+  }
+}

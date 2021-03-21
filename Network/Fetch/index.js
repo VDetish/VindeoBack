@@ -16,3 +16,15 @@ export function query(resource, { method, body }, callback) {
     }
   })
 }
+
+export function get(url, callback) {
+  request.get({ url }, (err, res) => {
+    if (err) {
+      callback(err, {})
+    } else {
+      const html = res.body.toString()
+
+      callback(null, html)
+    }
+  })
+}
