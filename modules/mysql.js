@@ -59,10 +59,7 @@ export async function addCall(fields) {
 }
 
 export async function checkCode({ phone, session, code }) {
-  const [
-    res,
-    err,
-  ] = await connection.query(
+  const [res, err] = await connection.query(
     'UPDATE calls SET validated = ? WHERE ? AND ? AND ? AND ? AND fails < 3',
     [1, { phone }, { code }, { session }, { validated: false }]
   )
@@ -70,7 +67,10 @@ export async function checkCode({ phone, session, code }) {
   if (err) {
     return false
   } else if (res.changedRows === 1) {
-    return true
+    const user = await getUserByPhone(phone)
+    await updateSession(session, user.id)
+
+    return user
   } else {
     await connection.query(
       'UPDATE calls SET fails = fails + 1 WHERE ? AND ? AND ?',
@@ -104,6 +104,14 @@ export async function createUser(session, phone) {
 export async function getUser(id) {
   const [res, err] = await connection.query('SELECT * FROM `users` WHERE ?', {
     id,
+  })
+
+  return res[0]
+}
+
+export async function getUserByPhone(phone) {
+  const [res, err] = await connection.query('SELECT * FROM `users` WHERE ?', {
+    phone,
   })
 
   return res[0]
@@ -226,6 +234,10 @@ export async function getArtists(session) {
 
 export async function addInterest(fields, session) {
   const userData = await getSessionUser(session)
+
+  console.log('session', session)
+  console.log(userData)
+
   fields.user = userData.user
 
   try {
