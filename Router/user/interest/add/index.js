@@ -19,15 +19,13 @@ export default async function (res, req) {
       return addInterest(json, session)
     })
     .then((added) => {
-      console.log(genre, added)
       if (added) {
-        return similarGenres(genre)
+        return similarGenres(genre, tempSession)
       } else {
         return false
       }
     })
     .then((genres) => {
-      console.log(genres)
       if (genres) {
         sendJson(res, { session: tempSession, json: { genres, added: true } })
       } else {

@@ -33,8 +33,21 @@ export default async function (res, req) {
   sendJson(res, { json: { cover } })
 }
 
+export async function putCover(artist) {
+  let db_path = await getCover(artist)
+
+  if (db_path.length === 0) {
+    const url = await searchCover(artist)
+    const path = guidGenerator() + url.split('.').pop()
+
+    request(url).pipe(fs.createWriteStream(default_path + path))
+
+    await addCover({ path, artist })
+  }
+}
+
 // Cache data!
-export async function searchCover(artist) {
+async function searchCover(artist) {
   return new Promise((resolve) => {
     get('https://www.last.fm/music/' + artist, (err, res) => {
       if (err) {

@@ -235,9 +235,6 @@ export async function getArtists(session) {
 export async function addInterest(fields, session) {
   const userData = await getSessionUser(session)
 
-  console.log('session', session)
-  console.log(userData)
-
   fields.user = userData.user
 
   try {
@@ -250,4 +247,16 @@ export async function addInterest(fields, session) {
   } catch (e) {
     return false
   }
+}
+
+export async function addArtistRecomend(fields, session) {
+  const userData = await getSessionUser(session)
+  fields.user = userData.user
+
+  const query = await connection.query(
+    'INSERT INTO `users_artists_recommend` SET ? ON DUPLICATE KEY UPDATE rate = rate + 1',
+    fields
+  )
+
+  return { status: !query[1] }
 }
