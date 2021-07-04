@@ -1,8 +1,11 @@
 import { query } from '../../../Network/Fetch/index.js'
 
+import { addArtistRecomend } from '../../../modules/mysql.js'
+import { putCover } from '../../../Router/data/artistCover/index.js'
+
 const stopList = ['seen live', 'All', 'Listen To This']
 
-export default async function (genre) {
+export default async function (genre, session) {
   const tags = []
 
   const {
@@ -11,8 +14,13 @@ export default async function (genre) {
 
   const artists = artist.splice(0, 10)
 
+  let five = 5
   for (const e of artists) {
-    console.log(e)
+    if (five !== 0) {
+      putCover(e.name)
+      await addArtistRecomend({ artist: e.name }, session)
+      five -= 1
+    }
 
     const {
       toptags: { tag },
@@ -29,7 +37,6 @@ export default async function (genre) {
         if (
           !isStop &&
           distance(e.name, e_.name) < 0.9 &&
-          // distance('seen live', e_.name) < 0.9 &&
           distance(genre, e_.name) < 0.9
         ) {
           tags.push({
