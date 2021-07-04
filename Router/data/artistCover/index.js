@@ -4,7 +4,7 @@ import fs from 'fs'
 import { get } from '../../../Network/Fetch/index.js'
 import { sendJson } from '../../../Utils/index.js'
 
-import { getCover, addCover } from '../../../modules/mysql_content.js'
+import { getCover, addCover } from '../../../modules/mysql.js'
 
 const default_path = 'Content/Covers/'
 

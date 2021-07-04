@@ -147,6 +147,21 @@ uWS
     res.writeHeader('Content-Type', 'image/jpeg').end(file)
   })
   .get('/artist/cover/:name', getCover)
+  .get('/artist/photo/:name', (res, req) => {
+    let name = req.getParameter(0)
+
+    let file = fs.readFileSync(
+      `./Content/Covers/${name}`,
+      function (err, data) {
+        if (err) {
+          res.end(`Error getting the file: ${err}.`)
+        } else {
+          res.writeHeader('Content-Type', 'image/jpeg').end(data)
+        }
+      }
+    )
+    res.writeHeader('Content-Type', 'image/jpeg').end(file)
+  })
   .post('/removePhoto', removePhoto)
   .post('/addInterest', addInterest)
   .listen(port, (token) => {
