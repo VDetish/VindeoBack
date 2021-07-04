@@ -260,3 +260,14 @@ export async function addArtistRecomend(fields, session) {
 
   return { status: !query[1] }
 }
+
+export async function getArtistsRecommend(session) {
+  const { user } = await getSessionUser(session)
+
+  const query = await connection.query(
+    'SELECT * FROM `users_artists_recommend`',
+    { user }
+  )
+
+  return query[0]
+}
