@@ -1,3 +1,5 @@
+import moment from 'moment'
+
 import Session from '../../../../Session/index.js'
 import { sendJson } from '../../../../Utils/index.js'
 import { getUsersRecomendations } from '../../../../modules/mysql.js'
@@ -13,6 +15,11 @@ export default async function (res, req) {
       return getUsersRecomendations(session)
     })
     .then((users) => {
+      users.forEach((user) => {
+        const age = moment().diff(moment(user.bdate, 'DD.MM.YYYY'), 'years')
+        user.age = age > 0 ? age : null
+      })
+
       sendJson(res, { session: tempSession, json: { users } })
     })
 }
