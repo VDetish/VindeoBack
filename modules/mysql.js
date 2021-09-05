@@ -344,12 +344,58 @@ export async function addArtistRecomend(fields, session) {
   return { status: !query[1] }
 }
 
+export async function addArtist(fields, session) {
+  const userData = await getSessionUser(session)
+  fields.user = userData.user
+
+  const query = await connection.query(
+    'INSERT INTO `toolmi`.`users_artists` SET ?',
+    fields
+  )
+
+  try {
+    await connection.query(
+      mysql.format(
+        'DELETE FROM `toolmi`.users_artists_recommend WHERE ? AND ?',
+        [{ user: userData.user }, { artist: fields.artist }]
+      )
+    )
+  } catch (e) {
+    console.log(e)
+  }
+
+  return { status: !query[1] }
+}
+
 export async function getArtistsRecommend(session) {
   const { user } = await getSessionUser(session)
 
   const query = await connection.query(
     'SELECT art.id, name, path FROM toolmi.users_artists_recommend AS art_rec JOIN WierdConnections.artists AS art ON art_rec.artist = art.id JOIN WierdConnections.artists_photos AS ph ON ph.artist = art_rec.artist WHERE ? ORDER BY art_rec.rate DESC',
     { 'art_rec.user': user }
+  )
+
+  return query[0]
+}
+
+export async function getUsersRecomendations(session) {
+  const { user } = await getSessionUser(session)
+
+  const query = await connection.query(
+    'SELECT * FROM `toolmi`.`cw_recommend_users` AS usr JOIN `WierdConnections`.`users__` AS us ON us.vID = usr.userTo WHERE ? AND ? AND ? LIMIT 10',
+    [{ 'usr.user': user ? user : 1 }, { isLiked: 0 }, { 'usr.sex': 1 }]
+  )
+
+  return query[0]
+}
+
+// Из VK
+export async function getUserPhotos(user, session) {
+  // const { user } = await getSessionUser(session)
+
+  const query = await connection.query(
+    'SELECT * FROM `WierdConnections`.`users_photo` WHERE ?',
+    [{ user }]
   )
 
   return query[0]

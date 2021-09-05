@@ -18,9 +18,12 @@ import removePhoto from './Router/user/photo/remove/index.js'
 
 import getRecommendations from './Router/recommendations/get/all/index.js'
 import getRecommendationsArtists from './Router/recommendations/get/artists/index.js'
+import getRecommendationsUsers from './Router/recommendations/get/users/index.js'
 
 import getTopGenres from './Router/data/topGenres/index.js'
 import addInterest from './Router/user/interest/add/index.js'
+import addArtist from './Router/user/artist/add/index.js'
+import getUserPhotos from './Router/user/photos/get/index.js'
 import getCover from './Router/data/artistCover/index.js'
 
 const port = 9001
@@ -131,8 +134,10 @@ uWS
   })
   .post('/uploadPhoto', addPhoto)
   .get('/photos', getPhotos)
+  .post('/user/photos', getUserPhotos)
   .get('/recommendations', getRecommendations)
   .get('/recommendations/artists', getRecommendationsArtists)
+  .get('/recommendations/users', getRecommendationsUsers)
   .get('/topGenres', getTopGenres)
   .get('/photos/get/:name', (res, req) => {
     let name = req.getParameter(0)
@@ -164,6 +169,7 @@ uWS
   })
   .post('/removePhoto', removePhoto)
   .post('/addInterest', addInterest)
+  .post('/addArtist', addArtist)
   .listen(port, (token) => {
     if (token) {
       console.log('Listening to port ' + port)
