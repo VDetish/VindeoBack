@@ -246,9 +246,11 @@ export async function deletePhoto({ sort }, session) {
 export async function getArtists(session) {
   const { user } = await getSessionUser(session)
 
-  // Get what user like ordered by rate
   const query = await connection.query(
-    'SELECT * FROM `toolmi`.`users_artists` WHERE ? ORDER BY rate DESC',
+    `SELECT rate, name, path FROM toolmi.users_artists AS art
+      LEFT JOIN WierdConnections.artists_photos AS ph ON ph.artist = art.artist
+      LEFT JOIN WierdConnections.artists AS a1 ON art.artist = a1.id
+      WHERE user=1 ORDER BY rate DESC`,
     {
       user,
     }
@@ -363,6 +365,35 @@ export async function addArtist(fields, session) {
   } catch (e) {
     console.log(e)
   }
+
+  return { status: !query[1] }
+}
+
+async function selectArtists(artists) {
+  const query = await connection.query(
+    'SELECT id, name, f_name FROM WierdConnections.artists WHERE f_name IN (?)',
+    [artists]
+  )
+
+  return query[0]
+}
+
+export async function addArtists(artists, session) {
+  const userData = await getSessionUser(session)
+  const artistsWithID = await selectArtists(artists.map(({ artist }) => artist))
+
+  const a3 = artists.map((t1) => ({
+    ...t1,
+    ...artistsWithID.find((t2) => t2.f_name === t1.artist),
+  }))
+
+  const a4 = a3.map(({ id, count }) => [userData.user, id, count])
+
+  const query = await connection.query(
+    `INSERT INTO toolmi.users_artists (user, artist, rate) VALUES ?
+    ON DUPLICATE KEY UPDATE rate=VALUES(rate)`,
+    [a4]
+  )
 
   return { status: !query[1] }
 }

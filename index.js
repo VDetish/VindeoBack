@@ -16,13 +16,15 @@ import addPhoto from './Router/user/photo/add/index.js'
 import getPhotos from './Router/user/photo/get/index.js'
 import removePhoto from './Router/user/photo/remove/index.js'
 
-import getRecommendations from './Router/recommendations/get/all/index.js'
+import getRecommendations from './Router/user/artists/get/index.js'
 import getRecommendationsArtists from './Router/recommendations/get/artists/index.js'
 import getRecommendationsUsers from './Router/recommendations/get/users/index.js'
 
 import getTopGenres from './Router/data/topGenres/index.js'
 import addInterest from './Router/user/interest/add/index.js'
 import addArtist from './Router/user/artist/add/index.js'
+import addArtists from './Router/user/artists/add/index.js'
+import getArtists from './Router/user/artists/get/index.js'
 import getUserPhotos from './Router/user/photos/get/index.js'
 import getCover from './Router/data/artistCover/index.js'
 
@@ -135,6 +137,7 @@ uWS
   .post('/uploadPhoto', addPhoto)
   .get('/photos', getPhotos)
   .post('/user/photos', getUserPhotos)
+  .get('/user/artists', getArtists)
   .get('/recommendations', getRecommendations)
   .get('/recommendations/artists', getRecommendationsArtists)
   .get('/recommendations/users', getRecommendationsUsers)
@@ -170,6 +173,7 @@ uWS
   .post('/removePhoto', removePhoto)
   .post('/addInterest', addInterest)
   .post('/addArtist', addArtist)
+  .post('/addArtists', addArtists)
   .listen(port, (token) => {
     if (token) {
       console.log('Listening to port ' + port)

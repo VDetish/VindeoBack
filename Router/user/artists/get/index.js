@@ -7,12 +7,13 @@ export default async function (res, req) {
   let tempSession = null
 
   Promise.all([session])
-    .then(([session, json]) => {
+    .then(([session]) => {
       tempSession = session
 
-      return getPhotos(session)
+      return getArtists(session)
     })
-    .then((photos) => {
-      sendJson(res, { session: tempSession, json: { photos } })
+    .then((artists) => {
+      console.log(artists)
+      sendJson(res, { session: tempSession, json: { artists } })
     })
 }
