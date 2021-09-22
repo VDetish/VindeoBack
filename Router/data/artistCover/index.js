@@ -58,10 +58,10 @@ export async function saveCovers(artists) {
   const putIn = a1.filter(({ path }) => !path)
 
   if (putIn.length > 0) {
-    for (const { name: artist, images } of artists) {
+    for (const { name: artist, images } of putIn) {
       const url = images[0].url
 
-      const path = guidGenerator() + '.jpg'
+      const path = guidGenerator() + 'jpg'
       request(url).pipe(fs.createWriteStream(default_path + path))
       await addCover({ path, artist })
     }

@@ -250,7 +250,7 @@ export async function getArtists(session) {
     `SELECT rate, name, path FROM toolmi.users_artists AS art
       LEFT JOIN WierdConnections.artists_photos AS ph ON ph.artist = art.artist
       LEFT JOIN WierdConnections.artists AS a1 ON art.artist = a1.id
-      WHERE user=1 ORDER BY rate DESC`,
+      WHERE ? ORDER BY rate DESC`,
     {
       user,
     }
