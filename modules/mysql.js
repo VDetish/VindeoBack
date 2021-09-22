@@ -291,14 +291,7 @@ export async function addCover({ artist, path }) {
 }
 
 export async function getArtist(artist) {
-  let artistName = htmlEntl
-    .decode(artist)
-    .replace(/[^\p{L}\p{N}\p{Z}]/gu, '')
-    .replace(/ +/g, ' ')
-    .trim()
-
-  artistName =
-    artistName.length >= 55 ? artistName.substring(0, 55) : artistName
+  const artistName = formatName(artist)
 
   const query = await connection.query(
     'SELECT * FROM WierdConnections.`artists` WHERE ? OR ?',
@@ -316,8 +309,6 @@ export async function getArtist(artist) {
 }
 
 export async function getCover(artist) {
-  // artist or artist formated
-
   const artists = await getArtist(artist)
 
   const query = await connection.query(
@@ -325,6 +316,17 @@ export async function getCover(artist) {
     {
       artist: artists[0].id,
     }
+  )
+
+  return query[0]
+}
+
+export async function getCovers(list) {
+  const artists = list.map(({ id }) => id)
+
+  const query = await connection.query(
+    'SELECT * FROM WierdConnections.artists_photos WHERE artist IN (?)',
+    [artists]
   )
 
   return query[0]
@@ -380,11 +382,15 @@ async function selectArtists(artists) {
 
 export async function addArtists(artists, session) {
   const userData = await getSessionUser(session)
-  const artistsWithID = await selectArtists(artists.map(({ artist }) => artist))
+  const artistsWithID = await selectArtists(
+    artists.map(({ artist }) => formatName(artist))
+  )
 
   const a3 = artists.map((t1) => ({
     ...t1,
-    ...artistsWithID.find((t2) => t2.f_name === t1.artist),
+    ...artistsWithID.find(
+      (t2) => t2.f_name === formatName(t1.artist.toUpperCase())
+    ),
   }))
 
   const a4 = a3.map(({ id, count }) => [userData.user, id, count])
@@ -395,7 +401,7 @@ export async function addArtists(artists, session) {
     [a4]
   )
 
-  return { status: !query[1] }
+  return { status: !query[1], data: a3 }
 }
 
 export async function getArtistsRecommend(session) {
@@ -430,4 +436,17 @@ export async function getUserPhotos(user, session) {
   )
 
   return query[0]
+}
+
+function formatName(artist) {
+  let artistName = htmlEntl
+    .decode(artist)
+    .replace(/[^\p{L}\p{N}\p{Z}]/gu, '')
+    .replace(/ +/g, ' ')
+    .trim()
+
+  artistName =
+    artistName.length >= 55 ? artistName.substring(0, 55) : artistName
+
+  return artistName
 }

@@ -4,7 +4,8 @@ import fs from 'fs'
 import { get } from '../../../Network/Fetch/index.js'
 import { sendJson } from '../../../Utils/index.js'
 
-import { getCover, addCover } from '../../../modules/mysql.js'
+import { getCover, getCovers, addCover } from '../../../modules/mysql.js'
+import { log } from 'console'
 
 const default_path = 'Content/Covers/'
 
@@ -43,6 +44,27 @@ export async function putCover(artist) {
     request(url).pipe(fs.createWriteStream(default_path + path))
 
     await addCover({ path, artist })
+  }
+}
+
+export async function saveCovers(artists) {
+  let covers = await getCovers(artists)
+
+  const a1 = artists.map((t1) => ({
+    ...t1,
+    ...covers.find((t2) => t2.artist === t1.id),
+  }))
+
+  const putIn = a1.filter(({ path }) => !path)
+
+  if (putIn.length > 0) {
+    for (const { name: artist, images } of artists) {
+      const url = images[0].url
+
+      const path = guidGenerator() + '.jpg'
+      request(url).pipe(fs.createWriteStream(default_path + path))
+      await addCover({ path, artist })
+    }
   }
 }
 
