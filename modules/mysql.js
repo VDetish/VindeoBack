@@ -381,6 +381,8 @@ async function selectArtists(artists) {
 }
 
 export async function addArtists(artists, session) {
+  artists = artists.filter((item) => item.artist !== undefined)
+
   const userData = await getSessionUser(session)
   const artistsWithID = await selectArtists(
     artists.map(({ artist }) => formatName(artist))
