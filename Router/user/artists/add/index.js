@@ -1,7 +1,10 @@
 import Session from '../../../../Session/index.js'
 import { addArtists } from '../../../../modules/mysql.js'
 import { readJson, sendJson } from '../../../../Utils/index.js'
-import { saveCovers } from '../../../../Router/data/artistCover/index.js'
+import {
+  saveCovers,
+  searchCovers,
+} from '../../../../Router/data/artistCover/index.js'
 
 export default async function (res, req) {
   let session = Session(res, req)
@@ -19,6 +22,8 @@ export default async function (res, req) {
     .then(({ status, data }) => {
       if (from === 'spotify') {
         return status, saveCovers(data)
+      } else if (from === 'vk') {
+        return status, searchCovers(data)
       }
     })
     .then((status) => {

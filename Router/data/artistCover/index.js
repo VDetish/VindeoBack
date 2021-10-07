@@ -1,11 +1,11 @@
 import request from 'request'
 import fs from 'fs'
+import querystring from 'querystring'
 
 import { get } from '../../../Network/Fetch/index.js'
 import { sendJson } from '../../../Utils/index.js'
 
 import { getCover, getCovers, addCover } from '../../../modules/mysql.js'
-import { log } from 'console'
 
 const default_path = 'Content/Covers/'
 
@@ -47,7 +47,7 @@ export async function putCover(artist) {
   }
 }
 
-export async function saveCovers(artists) {
+async function emptyCovers(artists) {
   let covers = await getCovers(artists)
 
   const a1 = artists.map((t1) => ({
@@ -55,10 +55,14 @@ export async function saveCovers(artists) {
     ...covers.find((t2) => t2.artist === t1.id),
   }))
 
-  const putIn = a1.filter(({ path }) => !path)
+  return a1.filter(({ path }) => !path)
+}
+
+export async function saveCovers(artists) {
+  const putIn = await emptyCovers(artists)
 
   if (putIn.length > 0) {
-    for (const { name: artist, images } of putIn) {
+    for (const { f_name: artist, images } of putIn) {
       const url = images[0].url
 
       const path = guidGenerator() + 'jpg'
@@ -68,18 +72,31 @@ export async function saveCovers(artists) {
   }
 }
 
+export async function searchCovers(artists) {
+  const putIn = await emptyCovers(artists)
+
+  if (putIn.length > 0) {
+    for (const { name: artist } of putIn) {
+      putCover(artist)
+    }
+  }
+}
+
 // Cache data!
 async function searchCover(artist) {
   return new Promise((resolve) => {
-    get('https://www.last.fm/music/' + artist, (err, res) => {
-      if (err) {
-        resolve({ error: err })
-      } else {
-        const image = res.split('<meta property="og:image"')[1].split('"')[1]
+    get(
+      new URL('https://www.last.fm/music/' + artist).toString(),
+      (err, res) => {
+        if (err) {
+          resolve({ error: err })
+        } else {
+          const image = res.split('<meta property="og:image"')[1].split('"')[1]
 
-        resolve(image)
+          resolve(image)
+        }
       }
-    })
+    )
   })
 }
 

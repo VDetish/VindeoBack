@@ -13,7 +13,6 @@ export default async function (res, req) {
       return getArtists(session)
     })
     .then((artists) => {
-      console.log(artists)
       sendJson(res, { session: tempSession, json: { artists } })
     })
 }

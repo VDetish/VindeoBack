@@ -393,7 +393,9 @@ export async function addArtists(artists, session) {
     ),
   }))
 
-  const a4 = a3.map(({ id, count }) => [userData.user, id, count])
+  const a4 = a3
+    .filter(({ id }) => !!id)
+    .map(({ id, count }) => [userData.user, id, count])
 
   const query = await connection.query(
     `INSERT INTO toolmi.users_artists (user, artist, rate) VALUES ?
