@@ -21,11 +21,11 @@
                 MusicKit.getInstance().authorize().then(function() {
                     console.log('after auth');
 
-                    MusicKit.getInstance().api.library.artists().then(function(artists) {
+                    MusicKit.getInstance().api.library.artists(null, { limit: 100 }).then(function(artists) {
                         console.log('Artists', artists);
                     });
                     
-                    MusicKit.getInstance().api.library.songs().then(function(songs) {
+                    MusicKit.getInstance().api.library.songs(null, { limit: 100 }).then(function(songs) {
                         console.log('Songs', songs);
                     });
                 });
