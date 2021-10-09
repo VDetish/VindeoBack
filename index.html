@@ -10,39 +10,38 @@
         let songs = []
         document.addEventListener('musickitloaded', () => {
             MusicKit.configure({ developerToken: 'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IkI0RzVITjYyODcifQ.eyJpYXQiOjE2MjgzOTE1NzYsImV4cCI6MTY0Mzk0MzU3NiwiaXNzIjoiNDhVTTlUODcyMyJ9.NF-7cb30hNZkYqDlAh-wgTK6_s33g5azmVXvJUGzfJCy5TededABZ0mx8qq8HrSmvu1Sm_rQ8B9pDxWInaD8gg', app: { name: 'Music', build: '1.0.0' } })
-
-            function getArtists() {
-                MusicKit.getInstance().api.library.artists(null, { limit: 100, offset: artists.length })
-                .then((a) => {
-                    artists = [...artists, ...a]
-
-                    if (a.length < 100) {
-                        getArtists()
-                    } else {
-                        window.ReactNativeWebView.postMessage(JSON.stringify({ data: artists, id: 1 }))
-                    }
-                })
-            }
-
-            function getSongs() {
-                MusicKit.getInstance().api.library.songs(null, { limit: 100, offset: songs.length })
-                .then((s) => {
-                    songs = [...songs, ...s]
-
-                    if (a.length < 100) {
-                        getSongs()
-                    } else {
-                        window.ReactNativeWebView.postMessage(JSON.stringify({ data: songs, id: 2 }))
-                    }
-                })
-            }
-
-            setTimeout(() => {
-                getArtists()
-                getSongs()
-            }, 3000);
-
         })
+        
+        function getArtists() {
+            MusicKit.getInstance().api.library.artists(null, { limit: 100, offset: artists.length })
+            .then((a) => {
+                artists = [...artists, ...a]
+
+                if (a.length < 100) {
+                    getArtists()
+                } else {
+                    window.ReactNativeWebView.postMessage(JSON.stringify({ data: artists, id: 1 }))
+                }
+            })
+        }
+
+        function getSongs() {
+            MusicKit.getInstance().api.library.songs(null, { limit: 100, offset: songs.length })
+            .then((s) => {
+                songs = [...songs, ...s]
+
+                if (a.length < 100) {
+                    getSongs()
+                } else {
+                    window.ReactNativeWebView.postMessage(JSON.stringify({ data: songs, id: 2 }))
+                }
+            })
+        }
+
+        setTimeout(() => {
+            getArtists()
+            getSongs()
+        }, 3000);
         </script>
     </body>
 </html>
