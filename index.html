@@ -11,11 +11,14 @@
         document.addEventListener('musickitloaded', () => {
             MusicKit.configure({ developerToken: 'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IkI0RzVITjYyODcifQ.eyJpYXQiOjE2MjgzOTE1NzYsImV4cCI6MTY0Mzk0MzU3NiwiaXNzIjoiNDhVTTlUODcyMyJ9.NF-7cb30hNZkYqDlAh-wgTK6_s33g5azmVXvJUGzfJCy5TededABZ0mx8qq8HrSmvu1Sm_rQ8B9pDxWInaD8gg', app: { name: 'Music', build: '1.0.0' } })
 
-            MusicKit.getInstance().authorize().then(() => {
-                console.log('we auth');
-                getArtists()
-                getSongs()
-            });
+            setTimeout(() => {
+                MusicKit.getInstance().authorize().then(() => {
+                    console.log('we auth');
+                    getArtists()
+                    getSongs()
+                });
+            }, 1000);
+
         })
 
         function getArtists() {
