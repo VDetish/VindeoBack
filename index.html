@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv='Content-Type' content='text/html;charset=UTF-8'>
+        <script src="https://js-cdn.music.apple.com/musickit/v1/musickit.js"></script>
+    </head>
+    <body>
+        <script>
+            const setupMusicKit = new Promise((resolve) => {
+                document.addEventListener("musickitloaded", () => {
+                    const musicKitInstance = window.MusicKit.configure({
+                    developerToken: "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IldINzRRTjUzQjQifQ.eyJpYXQiOjE2MzM4MDA4NzYsImV4cCI6MTY0OTM1Mjg3NiwiaXNzIjoiMkY3VEE5WjU0WS5tZWRpYS50b29sLmNhdGFsb2cifQ.mXS398FbMCWmYaeo_9GFk111Wj_0015qhoJBM-oF-x-uXjw17FYgiSLl1pGBy1jSzCJuB38wadQmJsC8mbuviw",
+                    app: {
+                        name: "MusicKit Web App",
+                        build: "1.0.0",
+                    },
+                    });
+                    delete window.MusicKit; // clear global scope
+                    resolve(musicKitInstance);
+                });
+            });
+
+            function authMe() {
+                setupMusicKit.then(async (musicKit) => {
+                    try {
+                        await musicKit.authorize(); 
+                        // await musicKit.unauthorize(); 
+                    } catch(error) {
+                        // Handle cases when authorization fails
+                    }
+                })
+            }
+        </script>
+
+        <a onclick="authMe()">Авторизоваться</a>
+    </body>
+</html>

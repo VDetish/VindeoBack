@@ -170,6 +170,17 @@ uWS
     )
     res.writeHeader('Content-Type', 'image/jpeg').end(file)
   })
+  .get('/auth/apple', (res, req) => {
+    let file = fs.readFileSync(`./index.html`, function (err, data) {
+      if (err) {
+        res.end(`Error getting the file: ${err}.`)
+      } else {
+        res.writeHeader('Content-Type', 'text/html; charset=UTF-8').end(data)
+      }
+    })
+    res.writeHeader('Content-Type', 'text/html; charset=UTF-8').end(file)
+  })
+
   .post('/removePhoto', removePhoto)
   .post('/addInterest', addInterest)
   .post('/addArtist', addArtist)
