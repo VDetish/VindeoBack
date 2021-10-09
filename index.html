@@ -23,9 +23,9 @@
                 console.log(artists.length);
 
                 if (a.length < 100) {
-                    getArtists()
-                } else {
                     window.ReactNativeWebView.postMessage(JSON.stringify({ data: artists, id: 1 }))
+                } else {
+                    getArtists()
                 }
             })
         }
@@ -41,9 +41,9 @@
                 console.log(songs.length);
 
                 if (a.length < 100) {
-                    getSongs()
-                } else {
                     window.ReactNativeWebView.postMessage(JSON.stringify({ data: songs, id: 2 }))
+                } else {
+                    getSongs()
                 }
             })
         }
