@@ -6,29 +6,34 @@
     </head>
     <body>
         <script>
-            const setupMusicKit = new Promise((resolve) => {
-                document.addEventListener("musickitloaded", () => {
-                    const musicKitInstance = window.MusicKit.configure({
-                    developerToken: "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IldINzRRTjUzQjQifQ.eyJpYXQiOjE2MzM4MDA4NzYsImV4cCI6MTY0OTM1Mjg3NiwiaXNzIjoiMkY3VEE5WjU0WS5tZWRpYS50b29sLmNhdGFsb2cifQ.mXS398FbMCWmYaeo_9GFk111Wj_0015qhoJBM-oF-x-uXjw17FYgiSLl1pGBy1jSzCJuB38wadQmJsC8mbuviw",
-                    app: {
-                        name: "MusicKit Web App",
-                        build: "1.0.0",
-                    },
-                    });
-                    delete window.MusicKit; // clear global scope
-                    resolve(musicKitInstance);
-                });
+            document.addEventListener('musickitloaded', function() {
+            MusicKit.configure({
+                developerToken: 'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IkI0RzVITjYyODcifQ.eyJpYXQiOjE2MjgzOTE1NzYsImV4cCI6MTY0Mzk0MzU3NiwiaXNzIjoiNDhVTTlUODcyMyJ9.NF-7cb30hNZkYqDlAh-wgTK6_s33g5azmVXvJUGzfJCy5TededABZ0mx8qq8HrSmvu1Sm_rQ8B9pDxWInaD8gg',
+                app: {
+                    name: 'Music',
+                    build: '1.0.0'
+                }
+            });
             });
 
             function authMe() {
-                setupMusicKit.then(async (musicKit) => {
-                    try {
-                        await musicKit.authorize(); 
-                        // await musicKit.unauthorize(); 
-                    } catch(error) {
-                        // Handle cases when authorization fails
-                    }
-                })
+                let music = MusicKit.getInstance();
+
+                // This is called with or without authorization: 
+                music.player.play();
+
+                // This ensures user authorization before calling play():
+                music.authorize().then(function() {
+                    music.player.play();
+                });
+
+                // You can wrap any method to ensure authorization before calling:
+                music.authorize().then(function() {
+                    music.api.library.albums.then(function(cloudAlbums) {
+                        // user's cloudAlbums
+                        console.log(cloudAlbums);
+                    });
+                });
             }
         </script>
 
