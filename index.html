@@ -40,7 +40,7 @@
                 
                 console.log(songs.length);
 
-                if (a.length < 100) {
+                if (s.length < 100) {
                     window.ReactNativeWebView.postMessage(JSON.stringify({ data: songs, id: 2 }))
                 } else {
                     getSongs()
