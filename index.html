@@ -22,9 +22,7 @@
                     console.log('after auth');
 
                     MusicKit.getInstance().api.library.albums().then(function(albums) {
-                        MusicKit.getInstance().setQueue(albums[0]).then(function(queue) {
-                            MusicKit.getInstance().play();
-                        });
+                        console.log('Albums', albums);
                     });
                 });
             }
