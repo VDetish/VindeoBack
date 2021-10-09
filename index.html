@@ -22,13 +22,13 @@
                     console.log('after auth');
 
                     MusicKit.getInstance().api.library.artists(null, { limit: 100 }).then(function(artists) {
-                        console.log('Artists', artists);
-                        alert(artists);
+                        console.log('Artists',  artists);
+                        alert(JSON.stringify(artists));
                     });
                     
                     MusicKit.getInstance().api.library.songs(null, { limit: 100 }).then(function(songs) {
                         console.log('Songs', songs);
-                        alert(songs);
+                        alert(JSON.stringify(artists));
                     });
                 });
             }
