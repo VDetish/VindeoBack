@@ -21,8 +21,12 @@
                 MusicKit.getInstance().authorize().then(function() {
                     console.log('after auth');
 
-                    MusicKit.getInstance().api.library.artists().then(function(albums) {
-                        console.log('Albums', albums);
+                    MusicKit.getInstance().api.library.artists().then(function(artists) {
+                        console.log('Artists', artists);
+                    });
+                    
+                    MusicKit.getInstance().api.library.songs().then(function(songs) {
+                        console.log('Songs', songs);
                     });
                 });
             }
