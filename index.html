@@ -6,8 +6,6 @@
     </head>
     <body>
         <script>
-            let music = null
-
             document.addEventListener('musickitloaded', function() {
                 MusicKit.configure({
                     developerToken: 'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IkI0RzVITjYyODcifQ.eyJpYXQiOjE2MjgzOTE1NzYsImV4cCI6MTY0Mzk0MzU3NiwiaXNzIjoiNDhVTTlUODcyMyJ9.NF-7cb30hNZkYqDlAh-wgTK6_s33g5azmVXvJUGzfJCy5TededABZ0mx8qq8HrSmvu1Sm_rQ8B9pDxWInaD8gg',
@@ -16,15 +14,17 @@
                         build: '1.0.0'
                     }
                 });
-
-                music = MusicKit.getInstance();
             });
 
             function authMe() {
                 // You can wrap any method to ensure authorization before calling:
-                music.authorize().then(function() {
-                    music.api.library.albums.then(function(cloudAlbums) {
-                        console.log(cloudAlbums);
+                MusicKit.getInstance().authorize().then(function() {
+                    console.log('after auth');
+
+                    MusicKit.getInstance().api.library.albums().then(function(albums) {
+                        MusicKit.getInstance().setQueue(albums[0]).then(function(queue) {
+                            MusicKit.getInstance().play();
+                        });
                     });
                 });
             }
