@@ -13,14 +13,9 @@
         })
 
         function getArtists() {
-            console.log('getArtists');
             MusicKit.getInstance().api.library.artists(null, { limit: 100, offset: artists.length })
             .then((a) => {
-                console.log(a);
-                
                 artists = [...artists, ...a]
-                
-                console.log(artists.length);
 
                 if (a.length < 100) {
                     window.ReactNativeWebView.postMessage(JSON.stringify({ data: artists, id: 1 }))
@@ -31,14 +26,9 @@
         }
         
         function getSongs() {
-            console.log('getSongs');
             MusicKit.getInstance().api.library.songs(null, { limit: 100, offset: songs.length })
             .then((s) => {
-                console.log(s);
-                
                 songs = [...songs, ...s]
-                
-                console.log(songs.length);
 
                 if (s.length < 100) {
                     window.ReactNativeWebView.postMessage(JSON.stringify({ data: songs, id: 2 }))
@@ -47,15 +37,15 @@
                 }
             })
         }
-
-
+        
         function startGet() {
             MusicKit.getInstance().authorize().then(() => {
-                console.log('we auth');
                 getArtists()
                 getSongs()
             });
         }
+
+        startGet();
 
         </script>
     <body><a onclick="startGet()">Получить всё</a></body>
