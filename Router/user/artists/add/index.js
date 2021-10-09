@@ -22,7 +22,7 @@ export default async function (res, req) {
     .then(({ status, data }) => {
       if (from === 'spotify') {
         return status, saveCovers(data)
-      } else if (from === 'vk') {
+      } else {
         return status, searchCovers(data)
       }
     })
