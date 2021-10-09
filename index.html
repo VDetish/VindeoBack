@@ -20,7 +20,11 @@
         function getArtists() {
             MusicKit.getInstance().api.library.artists(null, { limit: 100, offset: artists.length })
             .then((a) => {
+                console.log(a);
+
                 artists = [...artists, ...a]
+
+                console.log(artists.length);
 
                 if (a.length < 100) {
                     getArtists()
@@ -33,7 +37,11 @@
         function getSongs() {
             MusicKit.getInstance().api.library.songs(null, { limit: 100, offset: songs.length })
             .then((s) => {
+                console.log(s);
+                
                 songs = [...songs, ...s]
+                
+                console.log(songs.length);
 
                 if (a.length < 100) {
                     getSongs()
