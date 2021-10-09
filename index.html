@@ -21,14 +21,12 @@
                 MusicKit.getInstance().authorize().then(function() {
                     console.log('after auth');
 
-                    MusicKit.getInstance().api.library.artists(null, { limit: 100 }).then(function(artists) {
-                        console.log('Artists',  artists);
-                        alert(JSON.stringify(artists));
+                    MusicKit.getInstance().api.library.artists(null, { limit: 100 }).then(function(artists) {                        
+                        window.ReactNativeWebView.postMessage(JSON.stringify({data:artists, id:1}));
                     });
                     
                     MusicKit.getInstance().api.library.songs(null, { limit: 100 }).then(function(songs) {
-                        console.log('Songs', songs);
-                        alert(JSON.stringify(artists));
+                        window.ReactNativeWebView.postMessage(JSON.stringify({data:songs, id:2}));
                     });
                 });
             }
