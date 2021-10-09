@@ -12,18 +12,20 @@
             MusicKit.configure({ developerToken: 'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IkI0RzVITjYyODcifQ.eyJpYXQiOjE2MjgzOTE1NzYsImV4cCI6MTY0Mzk0MzU3NiwiaXNzIjoiNDhVTTlUODcyMyJ9.NF-7cb30hNZkYqDlAh-wgTK6_s33g5azmVXvJUGzfJCy5TededABZ0mx8qq8HrSmvu1Sm_rQ8B9pDxWInaD8gg', app: { name: 'Music', build: '1.0.0' } })
 
             MusicKit.getInstance().authorize().then(() => {
+                console.log('we auth');
                 getArtists()
                 getSongs()
             });
         })
 
         function getArtists() {
+            console.log('getArtists');
             MusicKit.getInstance().api.library.artists(null, { limit: 100, offset: artists.length })
             .then((a) => {
                 console.log(a);
-
+                
                 artists = [...artists, ...a]
-
+                
                 console.log(artists.length);
 
                 if (a.length < 100) {
@@ -33,8 +35,9 @@
                 }
             })
         }
-
+        
         function getSongs() {
+            console.log('getSongs');
             MusicKit.getInstance().api.library.songs(null, { limit: 100, offset: songs.length })
             .then((s) => {
                 console.log(s);
