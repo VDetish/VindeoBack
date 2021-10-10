@@ -14,7 +14,10 @@
             const signature = CryptoJS.MD5(`api_key${REACT_APP_API_KEY}methodauth.getSessiontoken${token}${secret}`).toString()
             const authUrl = `https://ws.audioscrobbler.com/2.0/?method=auth.getSession&token=${token}&api_key=${REACT_APP_API_KEY}&api_sig=${signature}&format=json`;
 
-            console.log(authUrl);
+            let response = await fetch(authUrl)
+		    response = await response.json()
+
+            console.log(response);
         </script>
         <a style="font-size: 26px;" onclick="startGet()">Получить песни</a>
     </body>
