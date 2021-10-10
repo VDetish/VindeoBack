@@ -9,11 +9,11 @@
         <script>
             console.log('url', window.location.href);
 
-            let token = 'fd2addc056b6ce5851a2ebd81ed7ffbc'
+            let token = 'cfLpxJpyABYYLqgc8S1gGtGF67Ef9EwK'
             let md5Key = 'api_key75b2164fbf069b64a9bf8318925686b2methodauth.getSessiontoken' + token + 'fd2addc056b6ce5851a2ebd81ed7ffbc'
             let api_sig = CryptoJS.MD5(md5Key).toString()
 
-            let authUrl = 'https://ws.audioscrobbler.com/2.0/?method=auth.getSession&api_key=75b2164fbf069b64a9bf8318925686b2&token=i-4KmLmphAJ4lh83ZrQWIo--rassaTcm&api_sig='+api_sig
+            let authUrl = 'https://ws.audioscrobbler.com/2.0/?method=auth.getSession&api_key=75b2164fbf069b64a9bf8318925686b2&token=i-4KmLmphAJ4lh83ZrQWIo--rassaTcm&api_sig='+api_sig + '&format=json'
 
             console.log(authUrl);
         </script>
