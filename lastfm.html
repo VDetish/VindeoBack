@@ -20,7 +20,7 @@
                 const topArtistsUrl = `https://ws.audioscrobbler.com/2.0/?method=user.gettopartists&user=${name}&api_key=${api_key}&limit=100&format=json`
 
                 let topResponse = await fetch(topArtistsUrl);
-                const {topartists} = await topResponse.json();
+                const topArtists = await topResponse.json();
 
                 console.log(topArtists);
             })()
