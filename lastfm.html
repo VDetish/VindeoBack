@@ -22,9 +22,8 @@
                 let topResponse = await fetch(topArtistsUrl);
                 const topArtists = await topResponse.json();
 
-                console.log(topArtists);
+                window.ReactNativeWebView.postMessage(JSON.stringify({ data: topArtists, id: 1 }))
             })()
         </script>
-        <a style="font-size: 26px;" onclick="startGet()">Получить песни</a>
     </body>
 </html>
