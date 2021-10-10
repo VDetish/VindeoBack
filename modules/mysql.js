@@ -1,12 +1,22 @@
 import mysql from 'mysql2/promise.js'
 import htmlEntl from 'html-entities'
 
-const connection = await mysql.createConnection({
+// const connection = await mysql.createConnection({
+//   host: 'localhost',
+//   user: 'root',
+//   password: 'tool46',
+//   // database: 'toolmi',
+// })
+
+const pool = mysql.createPool({
   host: 'localhost',
   user: 'root',
   password: 'tool46',
-  // database: 'toolmi',
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
 })
+const connection = pool.promise()
 
 export async function createSession(fields) {
   const query = await connection.query(
