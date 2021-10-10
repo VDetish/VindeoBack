@@ -9,18 +9,17 @@
         <script async>
             const token = window.location.href.split("token=")[1];
             const secret = "fd2addc056b6ce5851a2ebd81ed7ffbc"
-            const REACT_APP_API_KEY = '75b2164fbf069b64a9bf8318925686b2';
-
-            const signature = CryptoJS.MD5(`api_key${REACT_APP_API_KEY}methodauth.getSessiontoken${token}${secret}`).toString()
-            const authUrl = `https://ws.audioscrobbler.com/2.0/?method=auth.getSession&token=${token}&api_key=${REACT_APP_API_KEY}&api_sig=${signature}&format=json`;
-
-            console.log(authUrl);
+            const api_key = '75b2164fbf069b64a9bf8318925686b2';
+            const signature = CryptoJS.MD5(`api_key${api_key}methodauth.getSessiontoken${token}${secret}`).toString()
+            const authUrl = `https://ws.audioscrobbler.com/2.0/?method=auth.getSession&token=${token}&api_key=${api_key}&api_sig=${signature}&format=json`;
 
             (async () => {
                 let response = await fetch(authUrl);
-		        response = await response.json();
+                const {session : {name}} = await response.json();
+                const topArtistsUrl = `https://ws.audioscrobbler.com/2.0/?method=user.gettopartists&user=${name}&api_key=${api_key}&format=json`
+                let topArtists = await fetch(topArtistsUrl);
 
-                console.log(response);
+                console.log(topArtists);
             })()
         </script>
         <a style="font-size: 26px;" onclick="startGet()">Получить песни</a>
