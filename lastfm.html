@@ -2,14 +2,14 @@
 <html>
     <head>
         <meta http-equiv='Content-Type' content='text/html;charset=UTF-8'>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/core.min.js" integrity="sha512-t8vdA86yKUE154D1VlNn78JbDkjv3HxdK/0MJDMBUXUjshuzRgET0ERp/0MAgYS+8YD9YmFwnz6+FWLz1gRZaw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/md5.min.js" integrity="sha512-3sGbaDyhjGb+yxqvJKi/gl5zL4J7P5Yh4GXzq+E9puzlmVkIctjf4yP6LfijOUvtoBI3p9pLKia9crHsgYDTUQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     </head>
     <body>
         <script>
-        var encrypted = CryptoJS.MD5('TEST');
-
-        console.log(encrypted);
-        console.log('url', window.location.href);
+            console.log('url', window.location.href);
+            var encrypted = CryptoJS.MD5('test');
+            console.log(encrypted);
         </script>
         <a style="font-size: 26px;" onclick="startGet()">Получить песни</a>
     </body>
