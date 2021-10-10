@@ -8,7 +8,7 @@ import htmlEntl from 'html-entities'
 //   // database: 'toolmi',
 // })
 
-const pool = mysql.createPool({
+const connection = mysql.createPool({
   host: 'localhost',
   user: 'root',
   password: 'tool46',
@@ -16,7 +16,6 @@ const pool = mysql.createPool({
   connectionLimit: 10,
   queueLimit: 0,
 })
-const connection = pool.promise()
 
 export async function createSession(fields) {
   const query = await connection.query(
