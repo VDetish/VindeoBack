@@ -8,10 +8,7 @@
     <body>
         <script>
             console.log('url', window.location.href);
-            var encrypted = CryptoJS.MD5('test').toString();
-            console.log(encrypted);
-            var api_sig = md5('api_key75b2164fbf069b64a9bf8318925686b2methodauth.getSessionfd2addc056b6ce5851a2ebd81ed7ffbc');
-
+            var api_sig = CryptoJS.MD5('api_key75b2164fbf069b64a9bf8318925686b2methodauth.getSessionfd2addc056b6ce5851a2ebd81ed7ffbc').toString();
             let authUrl = 'http://www.last.fm/api/show/auth.getSession?token=i-4KmLmphAJ4lh83ZrQWIo--rassaTcm&api_key=75b2164fbf069b64a9bf8318925686b2&api_sig='+api_sig
 
             console.log(authUrl);
