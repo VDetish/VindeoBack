@@ -14,6 +14,7 @@ import setUserAge from './Router/user/setAge/index.js'
 import setUserOrientation from './Router/user/setOrientation/index.js'
 import addPhoto from './Router/user/photo/add/index.js'
 import getPhotos from './Router/user/photo/get/index.js'
+import getChats from './Router/user/chats/get/index.js'
 import removePhoto from './Router/user/photo/remove/index.js'
 
 import getRecommendations from './Router/user/artists/get/index.js'
@@ -41,10 +42,9 @@ import twilio from 'twilio'
 var client = new twilio(accountSid, authToken)
 // Send sms
 
-uWS
-  ./*SSL*/ App()
-  .ws('/*', {
-    idleTimeout: 30,
+
+uWS.App().ws('/*', {
+    idleTimeout: 32,
     maxBackpressure: 1024,
     maxPayloadLength: 512,
     compression: uWS.DEDICATED_COMPRESSOR_3KB,
@@ -62,14 +62,8 @@ uWS
       //ws.subscribe('#');
     },
     message: (ws, message) => {
-      // Convert message from ArrayBuffer to String asuming it is UTF8
       message = stringDecoder.write(new DataView(message))
-      if (message === '') {
-        // PING
-        ws.send('') // PONG
-      } else {
-        handleMessage(ws, message)
-      }
+      handleMessage(ws, message)
     },
     drain: (ws) => {
       console.log('WebSocket backpressure: ' + ws.getBufferedAmount())
@@ -186,6 +180,7 @@ uWS
   .post('/addInterest', addInterest)
   .post('/addArtist', addArtist)
   .post('/addArtists', addArtists)
+  .get('/chats', getChats)
   .listen(port, (token) => {
     if (token) {
       console.log('Listening to port ' + port)
@@ -210,19 +205,17 @@ function onAbortedOrFinishedResponse(res, readStream) {
   res.id = -1
 }
 
-function handleMessage(ws, message) {
-  console.log('<- ' + ws.client.uuid + ': ' + message)
-  var indexOfComma = message.indexOf(',')
-  var command = message,
-    payload
-  if (indexOfComma >= 0) {
-    command = message.slice(0, indexOfComma)
-    payload = JSON.parse(message.slice(indexOfComma + 1))
-  }
-  switch (command) {
+function handleMessage(ws, data) {
+  const {action} = JSON.parse(data);
+
+  console.log('<- ' + ws.client.uuid + ': ' + JSON.stringify(message))
+
+
+  switch (action) {
     case 'login':
       ws.client.nickname = payload.nickname
-      send(ws, 'welcome', {
+      send(ws, {
+        action: 'welcome',
         uuid: ws.client.uuid,
       })
       publish(ws, 'info', 'user joined', {
@@ -230,7 +223,7 @@ function handleMessage(ws, message) {
         participants: connected_clients.size,
       })
       break
-    case 'new message':
+    case 'message':
       publish(ws, 'room', 'new message', {
         nickname: ws.client.nickname,
         uuid: ws.client.uuid,
@@ -240,8 +233,8 @@ function handleMessage(ws, message) {
   }
 }
 
-function send(ws, command, payload) {
-  ws.send(command + ',' + JSON.stringify(payload))
+function send(ws, payload) {
+  ws.send(JSON.stringify(payload))
 }
 
 function publish(ws, topic, command, payload) {
