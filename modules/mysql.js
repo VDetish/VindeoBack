@@ -81,19 +81,29 @@ export async function checkCode({ phone, session, code }) {
   )
 
   if (err) {
-    return false
+    return { valid: false, isNewUser: false }
   } else if (res.changedRows === 1) {
     const user = await getUserByPhone(phone)
-    await updateSession(session, user.id)
 
-    return user
+    // Либо вход, либо регистрация
+    if (!user) {
+      await createUser(session, phone)
+      const user = await getUserByPhone(phone)
+      await updateSession(session, user.id)
+
+      return { valid: true, isNewUser: true }
+    } else {
+      await updateSession(session, user.id)
+
+      return { valid: true, isNewUser: false }
+    }
   } else {
     await connection.query(
       'UPDATE `toolmi`.calls SET fails = fails + 1 WHERE ? AND ? AND ?',
       [{ phone }, { session }, { validated: false }]
     )
 
-    return false
+    return { valid: false, isNewUser: false }
   }
 }
 
@@ -450,6 +460,25 @@ export async function getUserPhotos(user, session) {
 
   return query[0]
 }
+
+//
+// Мессенджер
+//
+
+export async function getUserChats(session) {
+  const { user } = await getSessionUser(session)
+
+  const query = await connection.query(
+    `SELECT c.id, c.name FROM toolmi.chat_users AS cu JOIN toolmi.chats AS c ON cu.chat = c.id WHERE ? AND cu.type = 1`,
+    [{ 'cu.user': user }]
+  )
+
+  return query[0]
+}
+
+//
+// Мессенджер
+//
 
 function formatName(artist) {
   let artistName = htmlEntl
