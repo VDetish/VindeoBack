@@ -41,11 +41,18 @@ export async function open(ws) {
     ws.subscribe(`chat/${id}`)
     ws.publish(
       `chat/${id}`,
-      JSON.stringify({ id, type: 'background', status: 'online' })
+      JSON.stringify({
+        id,
+        type: 'foreground',
+        action: 'userStatus',
+        status: 'online',
+      })
     )
   })
 
-  ws.send(JSON.stringify({ type: 'chatList', data: chatList }))
+  ws.send(
+    JSON.stringify({ type: 'foreground', action: 'chatList', data: chatList })
+  )
 }
 
 export async function close(ws, app) {

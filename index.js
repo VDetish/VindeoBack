@@ -163,8 +163,10 @@ function onAbortedOrFinishedResponse(res, readStream) {
   res.id = -1
 }
 
+let i = 0
+
 function handleMessage(ws, data) {
-  const { action, nickname, message } = JSON.parse(data)
+  const { action, nickname, text } = JSON.parse(data)
 
   console.log('<- ' + ws.client.session + ': ' + JSON.stringify(data))
 
@@ -184,8 +186,9 @@ function handleMessage(ws, data) {
       publish(ws, 'room', 'new message', {
         nickname: ws.client.nickname,
         session: ws.client.session,
-        text: message.text,
+        text,
       })
+
       break
   }
 }
