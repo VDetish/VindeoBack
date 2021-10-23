@@ -1,4 +1,8 @@
+import { StringDecoder } from 'string_decoder'
+
 import { getSessionUser, getUser, getUserChats } from '../mysql.js'
+
+const stringDecoder = new StringDecoder('utf8')
 
 export async function upgrade(res, req, context) {
   const upgradeAborted = { aborted: false }
@@ -76,4 +80,37 @@ export async function close(ws, app) {
 
   // Получить все чаты где пользователь — отправить offline
   // Получить диалоги с пользователем — отправить offline
+}
+
+export function message(ws, app, message) {
+  message = stringDecoder.write(new DataView(message))
+  const { action, text, chat } = JSON.parse(message)
+
+  // Проверять, может ли пользователь писать в чат
+  // ws.client.session / ws.session
+
+  console.log('<- ' + ws.client.session + ': ' + JSON.stringify(message))
+
+  switch (action) {
+    case 'message':
+      sendAll(ws, app, text, chat)
+
+      break
+  }
+}
+
+function sendAll(ws, app, text, chat) {
+  const message = JSON.stringify({
+    action: 'message',
+    type: 'foreground',
+    chat,
+    message: {
+      name: ws.client.name,
+      text,
+      time: new Date(),
+    },
+  })
+
+  app.publish(`chat/${chat}`, message)
+  // ws.send(message)
 }

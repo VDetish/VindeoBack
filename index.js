@@ -1,9 +1,8 @@
 import uWS from 'uWebSockets.js'
-import { StringDecoder } from 'string_decoder'
 import fs from 'fs'
 
-import { getUser, getUserChats } from './modules/mysql.js'
-import { upgrade, open, close } from './modules/Socket/index.js'
+import { getUser } from './modules/mysql.js'
+import { upgrade, open, close, message } from './modules/Socket/index.js'
 
 import device from './Router/device/index.js'
 import sendCode from './Router/code/send/index.js'
@@ -31,7 +30,6 @@ import getUserPhotos from './Router/user/photos/get/index.js'
 import getCover from './Router/data/artistCover/index.js'
 
 const port = 9001
-const stringDecoder = new StringDecoder('utf8')
 
 // Send sms
 var accountSid = 'AC64664f594eceb830a09387f980e2a520' // Your Account SID from www.twilio.com/console
@@ -51,9 +49,7 @@ const app = uWS
     compression: uWS.DEDICATED_COMPRESSOR_3KB,
     upgrade,
     open,
-    message: (ws, message) => {
-      handleMessage(ws, stringDecoder.write(new DataView(message)))
-    },
+    message: (ws, msg) => message(ws, app, msg),
     drain: (ws) => {
       console.log('WebSocket backpressure: ' + ws.getBufferedAmount())
     },
@@ -161,46 +157,4 @@ function onAbortedOrFinishedResponse(res, readStream) {
 
   /* Mark this response already accounted for */
   res.id = -1
-}
-
-let i = 0
-
-function handleMessage(ws, data) {
-  const { action, nickname, text } = JSON.parse(data)
-
-  console.log('<- ' + ws.client.session + ': ' + JSON.stringify(data))
-
-  switch (action) {
-    case 'login':
-      ws.client.nickname = nickname
-      send(ws, {
-        action: 'welcome',
-        session: ws.client.session,
-      })
-      publish(ws, 'info', 'user joined', {
-        nickname: ws.client.nickname,
-        // participants: connected_clients.size,
-      })
-      break
-    case 'message':
-      publish(ws, 'room', 'new message', {
-        nickname: ws.client.nickname,
-        session: ws.client.session,
-        text,
-      })
-
-      break
-  }
-}
-
-function send(ws, payload) {
-  ws.send(JSON.stringify(payload))
-}
-
-function publish(ws, topic, command, payload) {
-  // ws.publish() not implemented yet. Using Map.forEach untill PubSub is available
-  //ws.publish(topic, command + ',' + JSON.stringify(payload));
-  // connected_clients.forEach((client_ws) => {
-  //   client_ws.send(command + ',' + JSON.stringify(payload))
-  // })
 }
