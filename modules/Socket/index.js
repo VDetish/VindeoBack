@@ -1,4 +1,5 @@
 import { StringDecoder } from 'string_decoder'
+import { randomBytes } from 'crypto'
 
 import { getSessionUser, getUser, getUserChats } from '../mysql.js'
 
@@ -35,6 +36,7 @@ export async function open(ws) {
 
   ws.client = {
     session: ws.session,
+    id: ws.userData.id,
     name: ws.userData.name + ' ' + ws.userData.family_name,
   }
 
@@ -84,29 +86,33 @@ export async function close(ws, app) {
 
 export function message(ws, app, message) {
   message = stringDecoder.write(new DataView(message))
-  const { action, text, chat } = JSON.parse(message)
+  const data = JSON.parse(message)
 
   // Проверять, может ли пользователь писать в чат
   // ws.client.session / ws.session
 
   console.log('<- ' + ws.client.session + ': ' + JSON.stringify(message))
 
-  switch (action) {
+  switch (data.action) {
     case 'message':
-      sendAll(ws, app, text, chat)
+      sendAll(ws, app, data)
 
       break
   }
 }
 
-function sendAll(ws, app, text, chat) {
+function sendAll(ws, app, { text, chat, hash }) {
+  const id = randomBytes(16).toString('hex')
+
   const message = JSON.stringify({
     action: 'message',
     type: 'foreground',
-    chat,
     message: {
-      name: ws.client.name,
+      id,
+      chat,
+      hash,
       text,
+      user: ws.client.id,
       time: new Date(),
     },
   })
