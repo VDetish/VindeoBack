@@ -69,19 +69,6 @@ const app = uWS
   .post('/setUserEmail', setUserEmail)
   .post('/setUserAge', setUserAge)
   .post('/setUserOrientation', setUserOrientation)
-  .post('/login', (res, req) => {
-    getUser(2, (response) => {
-      console.log(response)
-
-      res
-        .writeHeader('Content-Type', 'application/json')
-        .end(JSON.stringify({ todo: 'Nobody but me' }))
-    })
-
-    res.onAborted(() => {
-      onAbortedOrFinishedResponse(res, readStream)
-    })
-  })
   .post('/uploadPhoto', addPhoto)
   .get('/photos', getPhotos)
   .post('/user/photos', getUserPhotos)

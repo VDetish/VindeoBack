@@ -91,11 +91,11 @@ export async function checkCode({ phone, session, code }) {
       const user = await getUserByPhone(phone)
       await updateSession(session, user.id)
 
-      return { valid: true, isNewUser: true }
+      return { valid: true, isNewUser: true, user: null }
     } else {
       await updateSession(session, user.id)
 
-      return { valid: true, isNewUser: false }
+      return { valid: true, isNewUser: false, user }
     }
   } else {
     await connection.query(

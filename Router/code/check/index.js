@@ -16,7 +16,7 @@ export default async function (res, req) {
       return checkCode({ phone, code, session })
     })
     .then((data) => {
-      const { valid, isNewUser } = data
-      sendJson(res, { session: tempSession, json: { valid, isNewUser } })
+      const { valid, isNewUser, user } = data
+      sendJson(res, { session: tempSession, json: { valid, isNewUser, user } })
     })
 }
