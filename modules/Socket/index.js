@@ -1,7 +1,11 @@
 import { StringDecoder } from 'string_decoder'
-import { randomBytes } from 'crypto'
-
-import { getSessionUser, getUser, getUserChats } from '../mysql.js'
+import {
+  getSessionUser,
+  getUser,
+  getUserChats,
+  addMessage,
+  getChatMessages,
+} from '../mysql.js'
 
 const stringDecoder = new StringDecoder('utf8')
 
@@ -59,6 +63,20 @@ export async function open(ws) {
   ws.send(
     JSON.stringify({ type: 'foreground', action: 'chatList', data: chatList })
   )
+
+  for (const { id } of chatList) {
+    const unreadMessages = await getChatMessages(id, ws.session)
+
+    if (unreadMessages.length > 0) {
+      ws.send(
+        JSON.stringify({
+          type: 'background',
+          action: 'chatUnreadMessages',
+          data: unreadMessages,
+        })
+      )
+    }
+  }
 }
 
 export async function close(ws, app) {
@@ -101,22 +119,14 @@ export function message(ws, app, message) {
   }
 }
 
-function sendAll(ws, app, { text, chat, hash }) {
-  const id = randomBytes(16).toString('hex')
+async function sendAll(ws, app, { text, chat, hash }) {
+  const { id, user, time } = await addMessage({ chat, hash, text }, ws.session)
 
   const message = JSON.stringify({
     action: 'message',
     type: 'foreground',
-    message: {
-      id,
-      chat,
-      hash,
-      text,
-      user: ws.client.id,
-      time: new Date(),
-    },
+    message: { id, chat, hash, text, user, time },
   })
 
   app.publish(`chat/${chat}`, message)
-  // ws.send(message)
 }

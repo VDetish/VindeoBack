@@ -476,6 +476,60 @@ export async function getUserChats(session) {
   return query[0]
 }
 
+export async function getMessage(id) {
+  const query = await connection.query(
+    'SELECT * FROM toolmi.chat_messages WHERE ?',
+    { id }
+  )
+
+  return query[0]
+}
+
+// Получаем последние 100 непрочитанных сообщений
+export async function getChatMessages(chat, session) {
+  const { user } = await getSessionUser(session)
+  const [res] = await userChatAccess({ user, chat })
+
+  if (res.access === 0 || res.access === 1 || res.access === 2) {
+    const query_format = mysql.format(
+      `SELECT * FROM toolmi.chat_messages WHERE ? AND ? AND id > ? ORDER BY time DESC LIMIT 100`,
+      [{ user }, { chat }, res.last_message]
+    )
+
+    const [res_] = await connection.query(query_format)
+
+    return res_
+  }
+}
+
+// 0 — читать, писать
+// 1 — читать
+// 2 — админ
+export async function userChatAccess({ user, chat }) {
+  const query_format = mysql.format(
+    `SELECT access, last_message FROM toolmi.chat_users WHERE ? AND ?`,
+    [{ user }, { chat }]
+  )
+
+  const [res] = await connection.query(query_format)
+
+  return res
+}
+
+export async function addMessage({ chat, hash, text }, session) {
+  const { user } = await getSessionUser(session)
+  const msg = { chat, hash, text, user }
+
+  const [res] = await connection.query(
+    `INSERT INTO toolmi.chat_messages SET ?`,
+    msg
+  )
+
+  const message = await getMessage(res.insertId)
+
+  return message[0]
+}
+
 //
 // Мессенджер
 //
