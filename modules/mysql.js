@@ -469,7 +469,7 @@ export async function getUserChats(session) {
   const { user } = await getSessionUser(session)
 
   const query = await connection.query(
-    `SELECT c.id, c.name FROM toolmi.chat_users AS cu JOIN toolmi.chats AS c ON cu.chat = c.id WHERE ? AND cu.type = 1`,
+    `SELECT c.id, c.name FROM toolmi.chat_users AS cu JOIN toolmi.chats AS c ON cu.chat = c.id WHERE ?`,
     [{ 'cu.user': user }]
   )
 
