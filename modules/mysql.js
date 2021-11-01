@@ -519,6 +519,18 @@ export async function addMessage({ chat, hash, text }, session) {
   return message[0]
 }
 
+// Проверять ещё на offline
+export async function chatPushTokens({ chat }) {
+  const [res] = await connection.query(
+    `SELECT ut.token FROM toolmi.chat_users AS ch JOIN toolmi.users_tokens AS ut ON ch.user = ut.user WHERE ?`,
+    [{ chat }]
+  )
+
+  const tokens = res.map((e) => e.token)
+
+  return tokens
+}
+
 //
 // Мессенджер
 //

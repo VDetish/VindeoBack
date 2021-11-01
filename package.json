@@ -9,6 +9,7 @@
   "author": "Vladislav Donets",
   "license": "MIT",
   "dependencies": {
+    "apn": "^2.2.0",
     "busboy": "^0.3.1",
     "html-entities": "^2.3.2",
     "moment": "^2.29.1",

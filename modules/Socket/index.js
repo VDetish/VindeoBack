@@ -7,6 +7,8 @@ import {
   getChatMessages,
 } from '../mysql.js'
 
+import { sendChatPush } from '../APN/index.js'
+
 const stringDecoder = new StringDecoder('utf8')
 
 export async function upgrade(res, req, context) {
@@ -129,4 +131,7 @@ async function sendAll(ws, app, { text, chat, hash }) {
   })
 
   app.publish(`chat/${chat}`, message)
+
+  // Исключить юзера который отослал
+  await sendChatPush({ title: user, body: text, chat })
 }
