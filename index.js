@@ -44,7 +44,7 @@ var client = new twilio(accountSid, authToken)
 const app = uWS
   .App()
   .ws('/*', {
-    idleTimeout: 10,
+    idleTimeout: 12,
     maxBackpressure: 1024,
     maxPayloadLength: 512,
     compression: uWS.DEDICATED_COMPRESSOR_3KB,

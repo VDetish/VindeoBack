@@ -87,8 +87,7 @@ export async function checkCode({ phone, session, code }) {
 
     // Либо вход, либо регистрация
     if (!user) {
-      await createUser(session, phone)
-      const user = await getUserByPhone(phone)
+      const user = await createUser(phone)
       await updateSession(session, user.id)
 
       return { valid: true, isNewUser: true, user: null }
@@ -107,27 +106,17 @@ export async function checkCode({ phone, session, code }) {
   }
 }
 
-export async function createUser(session, phone) {
-  const userData = await getSessionUser(session)
+export async function createUser(phone) {
+  const [{ insertId }, err] = await connection.query(
+    'INSERT INTO `toolmi`.`users` SET ?',
+    {
+      phone,
+    }
+  )
 
-  if (userData.user > 0) {
-    const user = await getUser(userData.user)
-    await updateSession(session, user.id)
+  const user = await getUser(insertId)
 
-    return user
-  } else {
-    const [res, err] = await connection.query(
-      'INSERT INTO `toolmi`.`users` SET ?',
-      {
-        phone,
-      }
-    )
-
-    const user = await getUser(res.insertId)
-    await updateSession(session, user.id)
-
-    return user
-  }
+  return user
 }
 
 export async function getUser(id) {

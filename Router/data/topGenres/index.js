@@ -1,8 +1,6 @@
 import { query } from '../../../Network/Fetch/index.js'
 import { sendJson } from '../../../Utils/index.js'
 
-import { checkCode, createUser } from '../../../modules/mysql.js'
-
 export default async function (res, req) {
   res.onAborted(() => {
     res.aborted = true
