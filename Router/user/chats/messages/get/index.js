@@ -6,7 +6,6 @@ export default async function (res, req) {
   let session = Session(res, req)
   let tempSession = null
   let id = req.getParameter(0)
-  console.log(id)
 
   Promise.all([session])
     .then(([session]) => {

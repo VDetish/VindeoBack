@@ -5,6 +5,7 @@ import { upgrade, open, close, message } from './modules/Socket/index.js'
 
 import device from './Router/device/index.js'
 import sendCode from './Router/code/send/index.js'
+import sendToken from './Router/user/sendToken/index.js' // push
 import checkCode from './Router/code/check/index.js'
 import removeUser from './Router/user/remove/index.js'
 import setUserInfo from './Router/user/setInfo/index.js'
@@ -57,6 +58,7 @@ const app = uWS
   })
   .post('/device', device)
   .post('/sendCode', sendCode)
+  .post('/sendToken', sendToken)
   .post('/checkCode', checkCode)
   .post('/removeUser', removeUser)
   .get('/*', (res, req) => {

@@ -142,10 +142,17 @@ export async function getUserByPhone(phone) {
 }
 
 export async function updateSession(value, user) {
-  await connection.query('UPDATE `toolmi`.sessions SET user = ? WHERE ?', [
+  await connection.query('UPDATE toolmi.sessions SET user = ? WHERE ?', [
     user,
     { value },
   ])
+
+  const setUserToken = mysql.format(
+    'UPDATE toolmi.user_tokens SET user = ? WHERE ?',
+    [user, { session: value }]
+  )
+
+  await connection.query(setUserToken)
 }
 
 export async function removeUser(session) {
@@ -519,16 +526,42 @@ export async function addMessage({ chat, hash, text }, session) {
   return message[0]
 }
 
+export async function addPushToken(token, session) {
+  const { user } = await getSessionUser(session)
+
+  try {
+    const [res, err] = await connection.query(
+      `INSERT INTO toolmi.user_tokens SET ?`,
+      {
+        user,
+        token,
+        session,
+      }
+    )
+
+    return !!err
+  } catch (e) {
+    return false
+  }
+}
+
 // Проверять ещё на offline
-export async function chatPushTokens({ chat }) {
+export async function chatPushTokens({ chat, user }) {
   const [res] = await connection.query(
-    `SELECT ut.token FROM toolmi.chat_users AS ch JOIN toolmi.users_tokens AS ut ON ch.user = ut.user WHERE ?`,
-    [{ chat }]
+    `SELECT ut.token FROM toolmi.chat_users AS ch JOIN toolmi.user_tokens AS ut ON ch.user = ut.user WHERE ? AND ch.user != ?`,
+    [{ chat }, user]
   )
 
-  const tokens = res.map((e) => e.token)
+  return res.map((e) => e.token)
+}
 
-  return tokens
+export async function getChatTitle(id) {
+  const [res] = await connection.query(
+    `SELECT name FROM toolmi.chats WHERE ?`,
+    [{ id }]
+  )
+
+  return res[0].name
 }
 
 //

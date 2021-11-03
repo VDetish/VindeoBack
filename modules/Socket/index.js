@@ -132,6 +132,11 @@ async function sendAll(ws, app, { text, chat, hash }) {
 
   app.publish(`chat/${chat}`, message)
 
-  // Исключить юзера который отослал
-  await sendChatPush({ title: user, body: text, chat })
+  await sendChatPush({
+    title: user,
+    userName: ws.client.name,
+    user,
+    body: text,
+    chat,
+  })
 }

@@ -2,7 +2,7 @@ import { Provider, Notification } from 'apn'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
-import { chatPushTokens } from '../mysql.js'
+import { getChatTitle, chatPushTokens } from '../mysql.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -18,15 +18,15 @@ const apnOptions = {
   production: apnProduction,
 }
 
-console.log(apnOptions.token.key)
-
 var apnProvider = new Provider(apnOptions)
 
-export async function sendChatPush({ title, body, chat }) {
+export async function sendChatPush({ body, userName, user, chat }) {
+  const chatTitle = await getChatTitle(chat)
+
   let notification = new Notification({
     alert: {
-      title,
-      body,
+      title: chatTitle,
+      body: userName + ': ' + body,
     },
     topic: 'toolmi',
     payload: {
@@ -36,13 +36,9 @@ export async function sendChatPush({ title, body, chat }) {
     pushType: 'alert',
   })
 
-  console.log(notification)
-
   // notification.badge = 666
 
-  const deviceTokens = await chatPushTokens({ chat })
-
-  console.log(deviceTokens)
+  const deviceTokens = await chatPushTokens({ chat, user })
 
   return new Promise((resolve, reject) => {
     apnProvider.send(notification, deviceTokens).then(({ sent, failed }) => {
