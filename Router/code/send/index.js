@@ -24,7 +24,7 @@ export default async function (res, req) {
       if (error) {
         return { status: false, error }
       } else if (code) {
-        const lastFour = parseInt(code.toString().substr(-4), 10)
+        const lastFour = code.toString().substr(-4)
 
         return addCall({
           phone: tempPhone,
