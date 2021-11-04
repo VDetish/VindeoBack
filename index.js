@@ -5,13 +5,18 @@ import { upgrade, open, close, message } from './modules/Socket/index.js'
 
 import device from './Router/device/index.js'
 import sendCode from './Router/code/send/index.js'
-import sendToken from './Router/user/sendToken/index.js' // push
 import checkCode from './Router/code/check/index.js'
+
+import sendToken from './Router/user/sendToken/index.js' // push
 import removeUser from './Router/user/remove/index.js'
 import setUserInfo from './Router/user/setInfo/index.js'
 import setUserEmail from './Router/user/setEmail/index.js'
 import setUserAge from './Router/user/setAge/index.js'
 import setUserOrientation from './Router/user/setOrientation/index.js'
+
+import getUserData from './Router/user/get/index.js'
+import logout from './Router/user/logout/index.js'
+
 import addPhoto from './Router/user/photo/add/index.js'
 import getPhotos from './Router/user/photo/get/index.js'
 import getChats from './Router/user/chats/get/index.js'
@@ -56,6 +61,8 @@ const app = uWS
     },
     close: (ws) => close(ws, app),
   })
+  .get('/user', getUserData)
+  .get('/logout', logout)
   .post('/device', device)
   .post('/sendCode', sendCode)
   .post('/sendToken', sendToken)

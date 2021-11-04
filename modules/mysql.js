@@ -130,6 +130,20 @@ export async function getUser(id) {
   return res[0]
 }
 
+export async function getUserFromSession(session) {
+  const { user } = await getSessionUser(session)
+
+  if (user) {
+    const userData = await getUser(user)
+
+    await updateSession(session, userData.id)
+
+    return userData
+  } else {
+    return null
+  }
+}
+
 export async function getUserByPhone(phone) {
   const [res, err] = await connection.query(
     'SELECT * FROM `toolmi`.`users` WHERE ?',
@@ -142,10 +156,10 @@ export async function getUserByPhone(phone) {
 }
 
 export async function updateSession(value, user) {
-  await connection.query('UPDATE toolmi.sessions SET user = ? WHERE ?', [
-    user,
-    { value },
-  ])
+  const [, err] = await connection.query(
+    'UPDATE toolmi.sessions SET user = ? WHERE ?',
+    [user, { value }]
+  )
 
   const setUserToken = mysql.format(
     'UPDATE toolmi.user_tokens SET user = ? WHERE ?',
@@ -153,6 +167,10 @@ export async function updateSession(value, user) {
   )
 
   await connection.query(setUserToken)
+
+  console.log(err)
+
+  return !err
 }
 
 export async function removeUser(session) {
