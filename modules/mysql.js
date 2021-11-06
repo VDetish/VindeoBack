@@ -511,7 +511,7 @@ export async function getContactList(session) {
   const { user } = await getSessionUser(session)
 
   const [contactList] = await connection.query(
-    `SELECT cuu.user, CONCAT(u.name, ' ', u.family_name) AS name, p.path, u.last_seen FROM toolmi.chat_users AS cu
+    `SELECT cuu.user, CONCAT(u.name, ' ', u.family_name) AS name, MAX(p.path) AS path, u.last_seen FROM toolmi.chat_users AS cu
       JOIN toolmi.chat_users AS cuu ON cuu.chat = cu.chat
       JOIN toolmi.users AS u ON cuu.user = u.id
       LEFT JOIN toolmi.photos AS p ON p.user = u.id AND p.sort = 1
