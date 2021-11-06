@@ -484,12 +484,27 @@ export async function getUserPhotos(user, session) {
 export async function getUserChats(session) {
   const { user } = await getSessionUser(session)
 
-  const query = await connection.query(
-    `SELECT c.id, c.name, c.type, c.user, c.color FROM toolmi.chat_users AS cu JOIN toolmi.chats AS c ON cu.chat = c.id WHERE ?`,
-    [{ 'cu.user': user }]
+  const [chatList] = await connection.query(
+    `SELECT c.id, c.name, c.type, c.user, c.color FROM toolmi.chat_users AS cu JOIN toolmi.chats AS c ON cu.chat = c.id WHERE ? AND ?`,
+    [{ 'cu.user': user }, { 'c.type': 2 }]
   )
 
-  return query[0]
+  const users = await userToUserChat(user)
+
+  return [...users, ...chatList]
+}
+
+export async function userToUserChat(user) {
+  const [chatList] = await connection.query(
+    `SELECT c.id, CONCAT(u.name, ' ', u.family_name) AS name, c.type, cuu.user, c.color FROM toolmi.chat_users AS cu
+    JOIN toolmi.chats AS c ON cu.chat = c.id
+    JOIN toolmi.chat_users AS cuu ON cuu.chat = cu.chat
+    JOIN toolmi.users AS u ON cuu.user = u.id
+    WHERE ? AND ? AND cuu.user != cu.user`,
+    [{ 'cu.user': user }, { 'c.type': 1 }]
+  )
+
+  return chatList
 }
 
 export async function getMessage(id) {
