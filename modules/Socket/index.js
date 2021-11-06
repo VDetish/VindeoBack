@@ -5,6 +5,7 @@ import {
   getUserChats,
   addMessage,
   getChatMessages,
+  getContactList,
 } from '../mysql.js'
 
 import { sendChatPush } from '../APN/index.js'
@@ -66,6 +67,15 @@ export async function open(ws) {
   }
 
   const chatList = await getUserChats(ws.session)
+  const contactList = await getContactList(ws.session)
+
+  ws.send(
+    JSON.stringify({
+      type: 'foreground',
+      action: 'contactList',
+      data: contactList,
+    })
+  )
 
   chatList.forEach((chat) => {
     chat.color = `${colorArr[chat.color[0]]},${colorArr[chat.color[1]]}`
