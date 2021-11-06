@@ -168,7 +168,9 @@ export async function updateSession(value, user) {
 
   await connection.query(setUserToken)
 
-  console.log(err)
+  if (err) {
+    console.log(err)
+  }
 
   return !err
 }
@@ -483,7 +485,7 @@ export async function getUserChats(session) {
   const { user } = await getSessionUser(session)
 
   const query = await connection.query(
-    `SELECT c.id, c.name FROM toolmi.chat_users AS cu JOIN toolmi.chats AS c ON cu.chat = c.id WHERE ?`,
+    `SELECT c.id, c.name, c.type, c.user, c.color FROM toolmi.chat_users AS cu JOIN toolmi.chats AS c ON cu.chat = c.id WHERE ?`,
     [{ 'cu.user': user }]
   )
 

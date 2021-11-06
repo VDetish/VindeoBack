@@ -37,6 +37,25 @@ export async function upgrade(res, req, context) {
   )
 }
 
+const colorArr = [
+  '#61e2be',
+  '#00c9ff',
+  '#ffaeba',
+  '#e4e63a',
+  '#cf8bf3',
+  '#a2dc6a',
+  '#fb6e94',
+  '#43aeef',
+  '#73ed86',
+  '#b3a0e8',
+]
+
+function getRandomAvatarColor() {
+  const random = Math.floor(Math.random() * colorArr.length)
+
+  return colorArr[random]
+}
+
 export async function open(ws) {
   console.log('WebSocket open, session: ' + ws.session)
 
@@ -47,6 +66,10 @@ export async function open(ws) {
   }
 
   const chatList = await getUserChats(ws.session)
+
+  chatList.forEach((chat) => {
+    chat.color = `${colorArr[chat.color[0]]},${colorArr[chat.color[1]]}`
+  })
 
   chatList.forEach(({ id }) => {
     console.log('Подписываем', `chat/${id}`)
