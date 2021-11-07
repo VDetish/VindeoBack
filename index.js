@@ -35,6 +35,8 @@ import getArtists from './Router/user/artists/get/index.js'
 import getUserPhotos from './Router/user/photos/get/index.js'
 import getCover from './Router/data/artistCover/index.js'
 
+import setUserReaction from './Router/recommendations/set/user/reaction/index.js'
+
 const port = 9001
 
 // Send sms
@@ -62,6 +64,7 @@ const app = uWS
     close: (ws) => close(ws, app),
   })
   .get('/user', getUserData)
+  .post('/user/reaction', setUserReaction)
   .get('/logout', logout)
   .post('/device', device)
   .post('/sendCode', sendCode)

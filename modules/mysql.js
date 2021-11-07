@@ -458,11 +458,23 @@ export async function getUsersRecomendations(session) {
   const { user } = await getSessionUser(session)
 
   const query = await connection.query(
-    'SELECT * FROM `toolmi`.`cw_recommend_users` AS usr JOIN `WierdConnections`.`users__` AS us ON us.vID = usr.userTo WHERE ? AND ? AND ? LIMIT 10',
-    [{ 'usr.user': user ? user : 1 }, { isLiked: 0 }, { 'usr.sex': 1 }]
+    'SELECT *, usr.id AS rec_id FROM toolmi.cw_recommend_users AS usr JOIN WierdConnections.users__ AS us ON us.vID = usr.userTo WHERE ? AND ? LIMIT 10',
+    // [{ 'usr.user': user ? user : 1 }, { isLiked: 0 }, { 'usr.sex': 1 }]
+    [{ 'usr.user': user ? user : 1 }, { isLiked: 0 }]
   )
 
   return query[0]
+}
+
+export async function setUsersReaction({ reaction, id }, session) {
+  const { user } = await getSessionUser(session)
+
+  const [res, err] = await connection.query(
+    'UPDATE toolmi.cw_recommend_users SET ? WHERE ? AND ?',
+    [{ isLiked: reaction }, { id }, { user }]
+  )
+
+  return res.changedRows === 1
 }
 
 // Из VK
