@@ -403,6 +403,11 @@ export async function addArtist(fields, session) {
     console.log(e)
   }
 
+  await connection.query(
+    'INSERT INTO toolmi.cw_queue SET ? ON DUPLICATE KEY UPDATE ready = 0',
+    [{ user: userData.user, ready: 0 }]
+  )
+
   return { status: !query[1] }
 }
 
