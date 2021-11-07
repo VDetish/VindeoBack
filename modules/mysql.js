@@ -383,34 +383,6 @@ export async function addArtistRecomend(fields, session) {
   return { status: !query[1] }
 }
 
-export async function addArtist(fields, session) {
-  const userData = await getSessionUser(session)
-  fields.user = userData.user
-
-  const query = await connection.query(
-    'INSERT INTO `toolmi`.`users_artists` SET ?',
-    fields
-  )
-
-  try {
-    await connection.query(
-      mysql.format(
-        'DELETE FROM `toolmi`.users_artists_recommend WHERE ? AND ?',
-        [{ user: userData.user }, { artist: fields.artist }]
-      )
-    )
-  } catch (e) {
-    console.log(e)
-  }
-
-  await connection.query(
-    'INSERT INTO toolmi.cw_queue SET ? ON DUPLICATE KEY UPDATE ready = 0',
-    [{ user: userData.user, ready: 0 }]
-  )
-
-  return { status: !query[1] }
-}
-
 async function selectArtists(artists) {
   const query = await connection.query(
     'SELECT id, name, f_name FROM WierdConnections.artists WHERE f_name IN (?)',
@@ -445,7 +417,40 @@ export async function addArtists(artists, session) {
     [a4]
   )
 
+  await connection.query(
+    'INSERT INTO toolmi.cw_queue SET ? ON DUPLICATE KEY UPDATE ready = 0',
+    [{ user: userData.user, ready: 0 }]
+  )
+
   return { status: !query[1], data: a3 }
+}
+
+export async function addArtist(fields, session) {
+  const userData = await getSessionUser(session)
+  fields.user = userData.user
+
+  const query = await connection.query(
+    'INSERT INTO `toolmi`.`users_artists` SET ?',
+    fields
+  )
+
+  try {
+    await connection.query(
+      mysql.format(
+        'DELETE FROM `toolmi`.users_artists_recommend WHERE ? AND ?',
+        [{ user: userData.user }, { artist: fields.artist }]
+      )
+    )
+  } catch (e) {
+    console.log(e)
+  }
+
+  await connection.query(
+    'INSERT INTO toolmi.cw_queue SET ? ON DUPLICATE KEY UPDATE ready = 0',
+    [{ user: userData.user, ready: 0 }]
+  )
+
+  return { status: !query[1] }
 }
 
 export async function getArtistsRecommend(session) {
