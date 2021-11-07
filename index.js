@@ -106,17 +106,22 @@ const app = uWS
   .get('/artist/photo/:name', (res, req) => {
     let name = req.getParameter(0)
 
-    let file = fs.readFileSync(
-      `./Content/Covers/${name}`,
-      function (err, data) {
-        if (err) {
-          res.end(`Error getting the file: ${err}.`)
-        } else {
-          res.writeHeader('Content-Type', 'image/jpeg').end(data)
+    try {
+      let file = fs.readFileSync(
+        `./Content/Covers/${name}`,
+        function (err, data) {
+          if (err) {
+            res.end(`Error getting the file: ${err}.`)
+          } else {
+            res.writeHeader('Content-Type', 'image/jpeg').end(data)
+          }
         }
-      }
-    )
-    res.writeHeader('Content-Type', 'image/jpeg').end(file)
+      )
+      res.writeHeader('Content-Type', 'image/jpeg').end(file)
+    } catch (error) {
+      console.log(`Error getting the file`, error)
+      res.end(`Error getting the file`, error)
+    }
   })
   .get('/auth/:name', (res, req) => {
     let name = req.getParameter(0)
