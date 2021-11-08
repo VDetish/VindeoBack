@@ -34,6 +34,7 @@ import addArtists from './Router/user/artists/add/index.js'
 import getArtists from './Router/user/artists/get/index.js'
 import getUserPhotos from './Router/user/photos/get/index.js'
 import getCover from './Router/data/artistCover/index.js'
+import getMutualArtists from './Router/user/artist/get/mutual/index.js'
 
 import setUserReaction from './Router/recommendations/set/user/reaction/index.js'
 
@@ -86,6 +87,7 @@ const app = uWS
   .post('/user/photos', getUserPhotos)
   .post('/chat/messages/:id', getChatMessages)
   .get('/user/artists', getArtists)
+  .post('/user/mutualArtists', getMutualArtists)
   .get('/recommendations', getRecommendations)
   .get('/recommendations/artists', getRecommendationsArtists)
   .get('/recommendations/users', getRecommendationsUsers)

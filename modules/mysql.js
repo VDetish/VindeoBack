@@ -476,6 +476,23 @@ export async function getUsersRecomendations(session) {
   return query[0]
 }
 
+export async function getMutualArtists(m_user, session) {
+  const { user } = await getSessionUser(session)
+
+  const to_bd = mysql.format(
+    `SELECT a.name, ph.path FROM WierdConnections.user_artists AS u_a
+      JOIN toolmi.users_artists AS my_u_a ON my_u_a.artist = u_a.artist
+      JOIN WierdConnections.artists_photos AS ph ON ph.artist = u_a.artist
+      JOIN WierdConnections.artists AS a ON a.id = my_u_a.artist
+    WHERE ? AND my_u_a.user = 1 ORDER BY my_u_a.rate DESC LIMIT 30`,
+    [{ 'u_a.user': m_user }, { 'my_u_a.user': user }]
+  )
+
+  const query = await connection.query(to_bd)
+
+  return query[0]
+}
+
 export async function setUsersReaction({ reaction, id }, session) {
   const { user } = await getSessionUser(session)
 
