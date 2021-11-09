@@ -484,13 +484,18 @@ export async function getMutualArtists(m_user, session) {
       JOIN toolmi.users_artists AS my_u_a ON my_u_a.artist = u_a.artist
       JOIN WierdConnections.artists_photos AS ph ON ph.artist = u_a.artist
       JOIN WierdConnections.artists AS a ON a.id = my_u_a.artist
-    WHERE ? AND my_u_a.user = 1 ORDER BY my_u_a.rate DESC LIMIT 30`,
+    WHERE ? AND my_u_a.user = 1 ORDER BY my_u_a.rate DESC LIMIT 25`,
     [{ 'u_a.user': m_user }, { 'my_u_a.user': user }]
   )
 
-  const query = await connection.query(to_bd)
+  const [my_fav] = await connection.query(to_bd)
+  const [user_fav] = await connection.query(
+    to_bd.replace('my_u_a.rate', 'u_a.count')
+  )
 
-  return query[0]
+  return [...my_fav, ...user_fav].filter(
+    (v, i, a) => a.findIndex((t) => t.name === v.name) === i
+  )
 }
 
 export async function setUsersReaction({ reaction, id }, session) {
