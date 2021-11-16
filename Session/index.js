@@ -8,7 +8,7 @@ export default async function (res, req) {
   })
 
   let session = req.getHeader('session')
-  const ip = remoteAddressToString(res.getRemoteAddress())
+  const ip = getIp(res)
 
   let isError = false
 
@@ -17,7 +17,7 @@ export default async function (res, req) {
 
     isError = await createSession({ value: session, ip })
   } else {
-    const isValid = await getSession(session)
+    const isValid = await getSession(session, ip)
 
     if (!isValid) {
       isError = await createSession({ value: session, ip })
@@ -31,6 +31,10 @@ export default async function (res, req) {
       resolve(session)
     }
   })
+}
+
+export function getIp(res) {
+  return remoteAddressToString(res.getRemoteAddress())
 }
 
 function remoteAddressToString(address) {

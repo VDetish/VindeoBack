@@ -19,7 +19,7 @@ const connection = mysql.createPool({
 
 export async function createSession(fields) {
   const query = await connection.query(
-    'INSERT INTO `toolmi`.`sessions` SET ?',
+    'INSERT INTO toolmi.sessions SET ?',
     fields
   )
 
@@ -28,11 +28,24 @@ export async function createSession(fields) {
 
 export async function getSession(value) {
   const query = await connection.query(
-    'SELECT * FROM `toolmi`.`sessions` WHERE ?',
+    'SELECT * FROM toolmi.sessions WHERE ?',
     {
       value,
     }
   )
+
+  const update = new Date()
+
+  await connection.query('UPDATE toolmi.sessions SET ? WHERE ?', [
+    { update },
+    { value },
+  ])
+
+  // await connection.query('UPDATE toolmi.sessions SET ? AND ? WHERE ?', [
+  //   { ip },
+  //   { update: new Date() },
+  //   { value },
+  // ])
 
   return query[0].length > 0
 }
