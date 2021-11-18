@@ -480,11 +480,14 @@ export async function getArtistsRecommend(session) {
 export async function getUsersRecomendations(session) {
   const { user } = await getSessionUser(session)
 
-  const query = await connection.query(
-    'SELECT *, usr.id AS rec_id FROM toolmi.cw_recommend_users AS usr JOIN WierdConnections.users__ AS us ON us.vID = usr.userTo WHERE ? AND ? LIMIT 10',
+  const to_bd = mysql.format(
+    'SELECT *, usr.id AS rec_id FROM toolmi.cw_recommend_users AS usr JOIN WierdConnections.users__ AS us ON us.vID = usr.userTo WHERE ? AND ? LIMIT 5',
     // [{ 'usr.user': user ? user : 1 }, { isLiked: 0 }, { 'usr.sex': 1 }]
     [{ 'usr.user': user ? user : 1 }, { isLiked: 0 }]
   )
+  console.log(to_bd)
+
+  const query = await connection.query(to_bd)
 
   return query[0]
 }
@@ -532,6 +535,20 @@ export async function getUserPhotos(user, session) {
   )
 
   return query[0]
+}
+
+// Фото из инсты от других пользователей
+export async function addInstagramPhotos({ photos, user }) {
+  const list = photos.map((el) => [user, el])
+
+  const to_bd = mysql.format(
+    'INSERT INTO toolmi.user_instagram (user, url) VALUES ? ON DUPLICATE KEY UPDATE times = times + 1',
+    [list]
+  )
+
+  const query = await connection.query(to_bd)
+
+  return { status: !query[1] }
 }
 
 //

@@ -33,6 +33,7 @@ import addArtist from './Router/user/artist/add/index.js'
 import addArtists from './Router/user/artists/add/index.js'
 import getArtists from './Router/user/artists/get/index.js'
 import getUserPhotos from './Router/user/photos/get/index.js'
+import addInstagram from './Router/user/photos/add/instagram/index.js'
 import getCover from './Router/data/artistCover/index.js'
 import getMutualArtists from './Router/user/artist/get/mutual/index.js'
 
@@ -66,6 +67,7 @@ const app = uWS
   })
   .get('/user', getUserData)
   .post('/user/reaction', setUserReaction)
+  .post('/user/addInstagram', addInstagram)
   .get('/logout', logout)
   .post('/device', device)
   .post('/sendCode', sendCode)
