@@ -538,6 +538,15 @@ export async function getUserPhotos(user, session) {
 }
 
 // Фото из инсты от других пользователей
+export async function getInstagramPhotos(user) {
+  const [res] = await connection.query(
+    'SELECT url FROM toolmi.user_instagram WHERE ?',
+    [{ user }]
+  )
+
+  return res
+}
+
 export async function addInstagramPhotos({ photos, user }) {
   const list = photos.map((el) => [user, el])
 
