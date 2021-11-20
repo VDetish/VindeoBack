@@ -479,17 +479,55 @@ export async function getArtistsRecommend(session) {
 
 export async function getUsersRecomendations(session) {
   const { user } = await getSessionUser(session)
+  await getSearchSettings(user)
 
-  const to_bd = mysql.format(
-    'SELECT *, usr.id AS rec_id FROM toolmi.cw_recommend_users AS usr JOIN WierdConnections.users__ AS us ON us.vID = usr.userTo WHERE ? AND ? LIMIT 5',
-    // [{ 'usr.user': user ? user : 1 }, { isLiked: 0 }, { 'usr.sex': 1 }]
+  const query = await connection.query(
+    `SELECT *, usr.id AS rec_id FROM toolmi.cw_recommend_users AS usr
+  JOIN WierdConnections.users__ AS us ON us.vID = usr.userTo
+  JOIN toolmi.user_settings AS settings ON settings.user = usr.user
+WHERE ? AND ? AND CASE WHEN settings.sex = 0 THEN usr.sex = 2 OR usr.sex = 1 ELSE usr.sex = settings.sex END LIMIT 5`,
     [{ 'usr.user': user ? user : 1 }, { isLiked: 0 }]
   )
-  console.log(to_bd)
-
-  const query = await connection.query(to_bd)
 
   return query[0]
+}
+
+// Настройки поиска
+export async function getSearchSettings(user) {
+  let [res, err] = await connection.query(
+    'SELECT * FROM toolmi.user_settings WHERE ?',
+    [{ user }]
+  )
+
+  if (res.length === 0) {
+    await saveSearchSettingsShort(
+      { sex: 0, city: 1, age_from: 18, age_to: 35 },
+      user
+    )
+  }
+
+  return false
+}
+
+export async function saveSearchSettingsShort(fields, user) {
+  fields.user = user
+
+  const query = await connection.query(
+    'INSERT INTO toolmi.user_settings SET ? ON DUPLICATE KEY UPDATE ?',
+    [fields, fields]
+  )
+  return { status: !!query[0] }
+}
+
+export async function saveSearchSettings(fields, session) {
+  const { user } = await getSessionUser(session)
+  fields.user = user
+
+  const query = await connection.query(
+    'INSERT INTO toolmi.user_settings SET ? ON DUPLICATE KEY UPDATE ?',
+    [fields, fields]
+  )
+  return { status: !!query[0] }
 }
 
 export async function getMutualArtists(m_user, session) {

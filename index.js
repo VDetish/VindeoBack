@@ -26,6 +26,7 @@ import removePhoto from './Router/user/photo/remove/index.js'
 import getRecommendations from './Router/user/artists/get/index.js'
 import getRecommendationsArtists from './Router/recommendations/get/artists/index.js'
 import getRecommendationsUsers from './Router/recommendations/get/users/index.js'
+import saveSearchSettings from './Router/recommendations/set/settings/index.js'
 
 import getTopGenres from './Router/data/topGenres/index.js'
 import addInterest from './Router/user/interest/add/index.js'
@@ -95,6 +96,7 @@ const app = uWS
   .get('/recommendations', getRecommendations)
   .get('/recommendations/artists', getRecommendationsArtists)
   .get('/recommendations/users', getRecommendationsUsers)
+  .post('/recommendations/settings', saveSearchSettings)
   .get('/topGenres', getTopGenres)
   .get('/photos/get/:name', (res, req) => {
     let name = req.getParameter(0)
