@@ -1,8 +1,7 @@
 import request from 'request'
-import querystring from 'querystring'
 
 export function query(resource, { method, body }, callback) {
-  const post_data = querystring.stringify(body)
+  const post_data = new URLSearchParams(body).toString()
   const url = `${resource}/${method}?${post_data}`
 
   request.get({ url }, (err, res) => {

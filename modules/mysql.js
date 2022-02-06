@@ -482,9 +482,10 @@ export async function getUsersRecomendations(session) {
   await getSearchSettings(user)
 
   const query = await connection.query(
-    `SELECT *, usr.id AS rec_id FROM toolmi.cw_recommend_users AS usr
+    `SELECT us.*, usr.userTo, usr.id AS rec_id, cities.name as cityName FROM toolmi.cw_recommend_users AS usr
   JOIN WierdConnections.users__ AS us ON us.vID = usr.userTo
   JOIN toolmi.user_settings AS settings ON settings.user = usr.user
+  LEFT JOIN toolmi.geo_cities AS cities ON cities.id = usr.city
 WHERE ? AND ? AND CASE WHEN settings.sex = 0 THEN usr.sex = 2 OR usr.sex = 1 ELSE usr.sex = settings.sex END LIMIT 5`,
     [{ 'usr.user': user ? user : 1 }, { isLiked: 0 }]
   )
@@ -507,6 +508,24 @@ export async function getSearchSettings(user) {
   }
 
   return false
+}
+
+export async function getCity(id) {
+  let [res, err] = await connection.query(
+    'SELECT * FROM toolmi.geo_cities WHERE ?',
+    [{ id }]
+  )
+
+  return res[0]
+}
+
+export async function addCity(fields) {
+  const query = await connection.query(
+    'INSERT INTO toolmi.geo_cities SET ?',
+    fields
+  )
+
+  return { status: !!query[0] }
 }
 
 export async function saveSearchSettingsShort(fields, user) {

@@ -2,6 +2,7 @@ import moment from 'moment'
 
 import Session from '../../../../Session/index.js'
 import { sendJson } from '../../../../Utils/index.js'
+import { getCities } from '../../../../modules/VK/index.js'
 import { getUsersRecomendations } from '../../../../modules/mysql.js'
 
 export default async function (res, req) {
@@ -14,11 +15,17 @@ export default async function (res, req) {
 
       return getUsersRecomendations(session)
     })
-    .then((users) => {
-      users.forEach((user) => {
+    .then(async (users) => {
+      for (const user of users) {
         const age = moment().diff(moment(user.bdate, 'DD.MM.YYYY'), 'years')
         user.age = age > 0 ? age : null
-      })
+
+        if (!user.cityName && user.city > 0) {
+          user.city = await getCities(user.city)
+        } else {
+          user.city = user.cityName
+        }
+      }
 
       sendJson(res, { session: tempSession, json: { users } })
     })
