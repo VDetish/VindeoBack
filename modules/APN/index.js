@@ -15,7 +15,7 @@ const apnOptions = {
     keyId: '788WW3A73J',
     teamId: 'T5C6JZM4H5',
   },
-  production: 'production',
+  production: true,
 }
 
 var apnProvider = new Provider(apnOptions)
@@ -41,7 +41,8 @@ export async function sendChatPush({ body, userName, user, chat }) {
   const deviceTokens = await chatPushTokens({ chat, user })
 
   return new Promise((resolve, reject) => {
-    apnProvider.send(notification, deviceTokens).then(({ sent, failed }) => {
+    apnProvider.send(notification, deviceTokens).then((result) => {
+      const {sent, failed} = result
       if (failed.length > 0) {
         console.log('failed', failed)
         reject(failed)
