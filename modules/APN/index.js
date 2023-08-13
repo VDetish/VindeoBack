@@ -12,8 +12,8 @@ const apnProduction = process.env.NODE_ENV === 'production' ? true : false
 const apnOptions = {
   token: {
     key: path.join(__dirname, '../..', 'certs', 'AuthKey_788WW3A73J.p8'),
-    keyId: 'W65D93FDYL',
-    teamId: 'ZSR82G27GC',
+    keyId: '788WW3A73J',
+    teamId: 'T5C6JZM4H5',
   },
   production: 'production',
 }
