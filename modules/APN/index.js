@@ -28,7 +28,7 @@ export async function sendChatPush({ body, userName, user, chat }) {
       title: chatTitle,
       body: userName + ': ' + body,
     },
-    topic: 'toolmi',
+    topic: 'org.toolmi',
     payload: {
       custom: 'value',
     },
