@@ -43,6 +43,9 @@ export async function sendChatPush({ body, userName, user, chat }) {
   return new Promise((resolve, reject) => {
     apnProvider.send(notification, deviceTokens).then((result) => {
       const {sent, failed} = result
+
+      console.log('full log', result);
+
       if (failed.length > 0) {
         console.log('failed', failed)
         reject(failed)
