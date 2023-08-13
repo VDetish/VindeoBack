@@ -715,9 +715,9 @@ twilio@^3.49.0:
     url-parse "^1.4.7"
     xmlbuilder "^13.0.2"
 
-uWebSockets.js@uNetworking/uWebSockets.js#v20.0.0:
-  version "20.0.0"
-  resolved "https://codeload.github.com/uNetworking/uWebSockets.js/tar.gz/4558ee00f9f1f686fffe1accbfc2e85b1af9c50f"
+uWebSockets.js@uNetworking/uWebSockets.js#v20.31.0:
+  version "20.31.0"
+  resolved "https://codeload.github.com/uNetworking/uWebSockets.js/tar.gz/809b99d2d7d12e2cbf89b7135041e9b41ff84084"
 
 uri-js@^4.2.2:
   version "4.3.0"

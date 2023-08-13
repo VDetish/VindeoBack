@@ -11,7 +11,7 @@ import htmlEntl from 'html-entities'
 const connection = mysql.createPool({
   host: 'localhost',
   user: 'root',
-  password: 'tool46',
+  password: 'root',
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,

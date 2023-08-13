@@ -17,6 +17,6 @@
     "querystring": "^0.2.0",
     "request": "^2.88.2",
     "twilio": "^3.49.0",
-    "uWebSockets.js": "uNetworking/uWebSockets.js#v20.0.0"
+    "uWebSockets.js": "uNetworking/uWebSockets.js#v20.31.0"
   }
 }
