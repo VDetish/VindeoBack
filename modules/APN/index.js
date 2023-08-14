@@ -15,7 +15,7 @@ const apnOptions = {
     keyId: '788WW3A73J',
     teamId: 'T5C6JZM4H5',
   },
-  production: true,
+  production: false,
 }
 
 var apnProvider = new Provider(apnOptions)
