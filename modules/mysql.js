@@ -134,9 +134,9 @@ export async function createUser(phone) {
 
 export async function getUser(id) {
   const [res, err] = await connection.query(
-    'SELECT * FROM `toolmi`.`users` WHERE ?',
+    'SELECT usr.*, ph.path as photo FROM `toolmi`.`users` AS usr JOIN toolmi.photos AS ph ON ph.user = usr.id WHERE ?',
     {
-      id,
+      'usr.id': id,
     }
   )
 
