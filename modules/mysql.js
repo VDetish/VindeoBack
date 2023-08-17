@@ -134,7 +134,7 @@ export async function createUser(phone) {
 
 export async function getUser(id) {
   const [res, err] = await connection.query(
-    'SELECT usr.*, ph.path as photo FROM `toolmi`.`users` AS usr JOIN toolmi.photos AS ph ON ph.user = usr.id WHERE ?',
+    'SELECT usr.*, ph.path as photo FROM `toolmi`.`users` AS usr LEFT JOIN toolmi.photos AS ph ON ph.user = usr.id WHERE ? ORDER BY ph.sort LIMIT 1',
     {
       'usr.id': id,
     }
@@ -483,12 +483,20 @@ export async function getUsersRecomendations(session) {
 
   const query = await connection.query(
     `SELECT us.*, usr.userTo, usr.id AS rec_id, cities.name as cityName FROM toolmi.cw_recommend_users AS usr
-  JOIN WierdConnections.users__ AS us ON us.vID = usr.userTo
-  JOIN toolmi.user_settings AS settings ON settings.user = usr.user
-  LEFT JOIN toolmi.geo_cities AS cities ON cities.id = usr.city
-WHERE ? AND ? AND CASE WHEN settings.sex = 0 THEN usr.sex = 2 OR usr.sex = 1 ELSE usr.sex = settings.sex END LIMIT 5`,
+      JOIN toolmi.users AS us ON us.id = usr.userTo
+      JOIN toolmi.user_settings AS settings ON settings.user = usr.user
+      LEFT JOIN toolmi.geo_cities AS cities ON cities.id = usr.city
+      WHERE ? AND ? AND CASE WHEN settings.sex = 0 THEN usr.sex = 2 OR usr.sex = 1 ELSE usr.sex = settings.sex END LIMIT 5`,
     [{ 'usr.user': user ? user : 1 }, { isLiked: 0 }]
   )
+//   const query = await connection.query(
+//     `SELECT us.*, usr.userTo, usr.id AS rec_id, cities.name as cityName FROM toolmi.cw_recommend_users AS usr
+//   JOIN WierdConnections.users__ AS us ON us.vID = usr.userTo
+//   JOIN toolmi.user_settings AS settings ON settings.user = usr.user
+//   LEFT JOIN toolmi.geo_cities AS cities ON cities.id = usr.city
+// WHERE ? AND ? AND CASE WHEN settings.sex = 0 THEN usr.sex = 2 OR usr.sex = 1 ELSE usr.sex = settings.sex END LIMIT 5`,
+//     [{ 'usr.user': user ? user : 1 }, { isLiked: 0 }]
+//   )
 
   return query[0]
 }
@@ -582,12 +590,16 @@ export async function setUsersReaction({ reaction, id }, session) {
   return res.changedRows === 1
 }
 
-// Из VK
 export async function getUserPhotos(user, session) {
   // const { user } = await getSessionUser(session)
 
+  // const query = await connection.query(
+  //   'SELECT * FROM `WierdConnections`.`users_photo` WHERE ?',
+  //   [{ user }]
+  // )
+  
   const query = await connection.query(
-    'SELECT * FROM `WierdConnections`.`users_photo` WHERE ?',
+    'SELECT * FROM toolmi.photos WHERE ?',
     [{ user }]
   )
 
