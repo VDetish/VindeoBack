@@ -101,14 +101,32 @@ const app = uWS
   .get('/photos/get/:name', (res, req) => {
     let name = req.getParameter(0)
 
-    let file = fs.readFileSync(`./temp/${name}`, function (err, data) {
-      if (err) {
-        res.end(`Error getting the file: ${err}.`)
-      } else {
-        res.writeHeader('Content-Type', 'image/jpeg').end(data)
-      }
-    })
-    res.writeHeader('Content-Type', 'image/jpeg').end(file)
+    // let file = fs.readFileSync(`./temp/${name}`, function (err, data) {
+    //   if (err) {
+    //     res.end(`Error getting the file: ${err}.`)
+    //   } else {
+    //     res.writeHeader('Content-Type', 'image/jpeg').end(data)
+    //   }
+    // })
+    // res.writeHeader('Content-Type', 'image/jpeg').end(file)
+
+    try {
+      let file = fs.readFileSync(`./temp/${name}`, function (err, data) {
+          res.writeHeader('Content-Type', 'image/jpeg').end(data)
+      })
+      res.writeHeader('Content-Type', 'image/jpeg').end(file)
+    }  catch(err) {
+      console.log(err);
+
+      let file = fs.readFileSync(`./temp/404.png`, function (err, data) {
+        if (err) {
+          res.end(`Error getting the file: ${err}.`)
+        } else {
+          res.writeHeader('Content-Type', 'image/jpeg').end(data)
+        }
+      })
+      res.writeHeader('Content-Type', 'image/jpeg').end(file)
+    }
   })
   .get('/artist/cover/:name', getCover)
   .get('/artist/photo/:name', (res, req) => {
