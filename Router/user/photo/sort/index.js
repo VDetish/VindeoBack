@@ -1,6 +1,6 @@
 import Session from '../../../../Session/index.js'
+import { sortPhotos } from '../../../../modules/mysql.js'
 import { readJson, sendJson } from '../../../../Utils/index.js'
-import { getUserPhotos } from '../../../../modules/mysql.js'
 
 export default async function (res, req) {
   let session = Session(res, req)
@@ -10,10 +10,9 @@ export default async function (res, req) {
   Promise.all([session, json])
     .then(([session, json]) => {
       tempSession = session
-
-      return getUserPhotos(json.user, session)
+      return sortPhotos(json, session)
     })
-    .then((photos) => {
-      sendJson(res, { session: tempSession, json: { photos } })
+    .then((status) => {
+      sendJson(res, { session: tempSession, json: { status } })
     })
 }

@@ -19,6 +19,7 @@ import logout from './Router/user/logout/index.js'
 
 import addPhoto from './Router/user/photo/add/index.js'
 import getPhotos from './Router/user/photo/get/index.js'
+import sortPhotos from './Router/user/photo/sort/index.js'
 import getChats from './Router/user/chats/get/index.js'
 import getChatMessages from './Router/user/chats/messages/get/index.js'
 import removePhoto from './Router/user/photo/remove/index.js'
@@ -89,6 +90,7 @@ const app = uWS
   .post('/setUserOrientation', setUserOrientation)
   .post('/uploadPhoto', addPhoto)
   .get('/photos', getPhotos)
+  .post('/photos/sort', sortPhotos)
   .post('/user/photos', getUserPhotos)
   .post('/chat/messages/:id', getChatMessages)
   .get('/user/artists', getArtists)

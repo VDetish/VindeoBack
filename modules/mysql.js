@@ -271,7 +271,7 @@ export async function getPhotos(session) {
   const { user } = await getSessionUser(session)
 
   const query = await connection.query(
-    'SELECT * FROM `toolmi`.`photos` WHERE ?',
+    'SELECT * FROM `toolmi`.`photos` WHERE ? ORDER BY sort',
     {
       user,
     }
@@ -489,17 +489,46 @@ export async function getUsersRecomendations(session) {
       WHERE ? AND ? AND CASE WHEN settings.sex = 0 THEN usr.sex = 2 OR usr.sex = 1 ELSE usr.sex = settings.sex END LIMIT 5`,
     [{ 'usr.user': user ? user : 1 }, { isLiked: 0 }]
   )
-//   const query = await connection.query(
-//     `SELECT us.*, usr.userTo, usr.id AS rec_id, cities.name as cityName FROM toolmi.cw_recommend_users AS usr
-//   JOIN WierdConnections.users__ AS us ON us.vID = usr.userTo
-//   JOIN toolmi.user_settings AS settings ON settings.user = usr.user
-//   LEFT JOIN toolmi.geo_cities AS cities ON cities.id = usr.city
-// WHERE ? AND ? AND CASE WHEN settings.sex = 0 THEN usr.sex = 2 OR usr.sex = 1 ELSE usr.sex = settings.sex END LIMIT 5`,
-//     [{ 'usr.user': user ? user : 1 }, { isLiked: 0 }]
-//   )
+  
+  // No users to recommend
+  if(query[0].length === 0) {
+    console.log('no users');
+    const users = await getUsers(user);
+    console.log('find users', users);
+
+    const rcUsers = [];
+
+    users.forEach((e) => {
+      rcUsers.push([user, e.id, 1, e.sex, e.location]);
+    })
+
+    rcUsers.length > 0 && await addUsers(rcUsers);
+  }
 
   return query[0]
 }
+
+// Поиск пользователей
+export async function getUsers(user) {
+  const query = await connection.query(
+    `SELECT *
+  FROM toolmi.users
+  WHERE id != ? AND id NOT IN
+      (SELECT userTo AS id
+       FROM toolmi.cw_recommend_users WHERE ?) LIMIT 5`, [user, {user}])
+
+  return query[0]
+}
+
+export async function addUsers(users) {
+  const query = await connection.query(
+    'INSERT IGNORE INTO toolmi.cw_recommend_users (user, userTo, quality, sex, city) values ?',
+    [users]
+  )
+
+  return query[0]
+}
+//
 
 // Настройки поиска
 export async function getSearchSettings(user) {
@@ -599,7 +628,7 @@ export async function getUserPhotos(user, session) {
   // )
   
   const query = await connection.query(
-    'SELECT * FROM toolmi.photos WHERE ?',
+    'SELECT * FROM toolmi.photos WHERE ? ORDER BY sort',
     [{ user }]
   )
 
@@ -622,6 +651,21 @@ export async function addInstagramPhotos({ photos, user }) {
   const to_bd = mysql.format(
     'INSERT INTO toolmi.user_instagram (user, url) VALUES ? ON DUPLICATE KEY UPDATE times = times + 1',
     [list]
+  )
+
+  const query = await connection.query(to_bd)
+
+  return { status: !query[1] }
+}
+
+export async function sortPhotos(photos, session) {
+  const { user } = await getSessionUser(session)
+  const list = photos.map((photo) => [user, photo[0], photo[1]])
+  const sort = photos.map((photo) => photo[1])
+
+  const to_bd = mysql.format(
+    'INSERT INTO toolmi.photos (user, id, sort) VALUES ? ON DUPLICATE KEY UPDATE sort=VALUES(sort)',
+    [list, sort]
   )
 
   const query = await connection.query(to_bd)

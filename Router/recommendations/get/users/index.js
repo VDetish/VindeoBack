@@ -17,7 +17,7 @@ export default async function (res, req) {
     })
     .then(async (users) => {
       for (const user of users) {
-        const age = moment().diff(moment(user.bdate, 'DD.MM.YYYY'), 'years')
+        const age = moment().diff(moment(user.birth_date, 'DD.MM.YYYY'), 'years')
         user.age = age > 0 ? age : null
 
         if (!user.cityName && user.city > 0) {
