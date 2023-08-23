@@ -280,12 +280,12 @@ export async function getPhotos(session) {
   return query[0]
 }
 
-export async function deletePhoto({ sort }, session) {
+export async function deletePhoto({ id }, session) {
   const { user } = await getSessionUser(session)
 
   const query = await connection.query(
     'DELETE FROM `toolmi`.photos WHERE ? AND ?',
-    [{ user }, { sort }]
+    [{ user }, { id }]
   )
 
   return !!query[1]
