@@ -4,7 +4,7 @@ export function query(resource, { method, body }, callback) {
   const post_data = new URLSearchParams(body).toString()
   const url = `${resource}/${method}?${post_data}`
 
-  request.get({ url }, (err, res) => {
+  request.get({ url, followAllRedirects: true }, (err, res) => {
     if (err) {
       callback(err, {})
     } else {
