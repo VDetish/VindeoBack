@@ -380,6 +380,12 @@ export async function getCovers(list) {
   return query[0]
 }
 
+export async function artistsNoCover() {
+  const query = await connection.query('SELECT name FROM WierdConnections.artists WHERE id NOT IN (SELECT artist FROM WierdConnections.artists_photos) LIMIT 20')
+
+  return query[0]
+}
+
 export async function addArtistRecomend(fields, session) {
   const userData = await getSessionUser(session)
   fields.user = userData.user
@@ -405,8 +411,20 @@ async function selectArtists(artists) {
   return query[0]
 }
 
+async function addArtistsToDb(artists) {
+  const query = await connection.query(
+    'insert ignore into WierdConnections.artists (name, f_name) values ?',
+    [artists]
+  )
+
+  return query
+}
+
 export async function addArtists(artists, session) {
   artists = artists.filter((item) => item.artist !== undefined)
+  const addArtists = artists.map((item) => [item?.artist, item?.artist.toUpperCase()])
+  console.log(addArtists);
+  await addArtistsToDb(addArtists)
 
   const userData = await getSessionUser(session)
   const artistsWithID = await selectArtists(
@@ -423,6 +441,9 @@ export async function addArtists(artists, session) {
   const a4 = a3
     .filter(({ id }) => !!id)
     .map(({ id, count }) => [userData.user, id, count])
+
+
+  console.log(a4);
 
   const query = await connection.query(
     `INSERT INTO toolmi.users_artists (user, artist, rate) VALUES ?
@@ -620,13 +641,6 @@ export async function setUsersReaction({ reaction, id }, session) {
 }
 
 export async function getUserPhotos(user, session) {
-  // const { user } = await getSessionUser(session)
-
-  // const query = await connection.query(
-  //   'SELECT * FROM `WierdConnections`.`users_photo` WHERE ?',
-  //   [{ user }]
-  // )
-  
   const query = await connection.query(
     'SELECT * FROM toolmi.photos WHERE ? ORDER BY sort',
     [{ user }]

@@ -77,23 +77,38 @@ export async function searchCovers(artists) {
 
   if (putIn.length > 0) {
     for (const { name: artist } of putIn) {
-      putCover(artist)
+      await putCover(artist)
     }
   }
 }
 
 // Cache data!
-async function searchCover(artist) {
+async function searchCover(artist, next) {
   return new Promise((resolve) => {
     get(
-      new URL('https://www.last.fm/music/' + artist).toString(),
+      new URL('https://www.last.fm/music/' + artist.replaceAll(" ", "+")).toString(),
       (err, res) => {
         if (err) {
           resolve({ error: err })
         } else {
-          const image = res.split('<meta property="og:image"')[1].split('"')[1]
-
-          resolve(image)
+          try {
+            const image = res.split('<meta property="og:image"')[1].split('"')[1]
+            setTimeout(() => {
+              console.log(image);
+              resolve(image)
+            }, 300);
+          } catch (error) {
+            console.log('error, wait', artist);
+            console.log(error);
+            console.log(res);
+            console.log(new URL('https://www.last.fm/music/' + artist.replaceAll(" ", "+")).toString());
+            if (next) {
+              return resolve({ error })
+            }
+            setTimeout(() => {
+              searchCover(artist, true)
+            }, 5000);
+          }
         }
       }
     )
