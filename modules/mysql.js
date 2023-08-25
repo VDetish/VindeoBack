@@ -295,7 +295,7 @@ export async function getArtists(session) {
   const { user } = await getSessionUser(session)
 
   const query = await connection.query(
-    `SELECT rate, name, path FROM toolmi.users_artists AS art
+    `SELECT art.artist AS id, rate, name, path FROM toolmi.users_artists AS art
       LEFT JOIN WierdConnections.artists_photos AS ph ON ph.artist = art.artist
       LEFT JOIN WierdConnections.artists AS a1 ON art.artist = a1.id
       WHERE ? ORDER BY rate DESC`,
@@ -324,11 +324,17 @@ export async function addInterest(fields, session) {
   }
 }
 
-export async function addCover({ artist, path }) {
-  const artists = await getArtist(artist)
+export async function addCover({ artist, artistId, path }) {
+  let artists = null;
+
+  if (!artistId) {
+    artists = await getArtist(artist)
+  } else {
+    artists = [{id:artistId}]
+  }
 
   const query = await connection.query(
-    'INSERT INTO WierdConnections.`artists_photos` SET ?',
+    'INSERT INTO WierdConnections.artists_photos SET ?',
     {
       artist: artists[0].id,
       path,
@@ -340,6 +346,8 @@ export async function addCover({ artist, path }) {
 
 export async function getArtist(artist) {
   const artistName = formatName(artist)
+  const addArtists = [[artist, artist.toUpperCase()]]
+  await addArtistsToDb(addArtists)
 
   const query = await connection.query(
     'SELECT * FROM WierdConnections.`artists` WHERE ? OR ?',
@@ -356,8 +364,14 @@ export async function getArtist(artist) {
   return query[0]
 }
 
-export async function getCover(artist) {
-  const artists = await getArtist(artist)
+export async function getCover(artist, artistId) {
+  let artists = null;
+
+  if (!artistId) {
+    artists = await getArtist(artist)
+  } else {
+    artists = [{id:artistId}]
+  }
 
   const query = await connection.query(
     'SELECT * FROM WierdConnections.`artists_photos` WHERE ?',
@@ -423,7 +437,6 @@ async function addArtistsToDb(artists) {
 export async function addArtists(artists, session) {
   artists = artists.filter((item) => item.artist !== undefined)
   const addArtists = artists.map((item) => [item?.artist, item?.artist.toUpperCase()])
-  console.log(addArtists);
   await addArtistsToDb(addArtists)
 
   const userData = await getSessionUser(session)
@@ -441,9 +454,6 @@ export async function addArtists(artists, session) {
   const a4 = a3
     .filter(({ id }) => !!id)
     .map(({ id, count }) => [userData.user, id, count])
-
-
-  console.log(a4);
 
   const query = await connection.query(
     `INSERT INTO toolmi.users_artists (user, artist, rate) VALUES ?
@@ -464,7 +474,7 @@ export async function addArtist(fields, session) {
   fields.user = userData.user
 
   const query = await connection.query(
-    'INSERT INTO `toolmi`.`users_artists` SET ?',
+    'INSERT INTO `toolmi`.`users_artists` SET ? ON DUPLICATE KEY UPDATE rate = rate + 1',
     fields
   )
 
@@ -513,10 +523,7 @@ export async function getUsersRecomendations(session) {
   
   // No users to recommend
   if(query[0].length === 0) {
-    console.log('no users');
     const users = await getUsers(user);
-    console.log('find users', users);
-
     const rcUsers = [];
 
     users.forEach((e) => {

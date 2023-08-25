@@ -1,7 +1,6 @@
 import { query } from '../../../Network/Fetch/index.js'
 
 import { addArtistRecomend } from '../../../modules/mysql.js'
-import { putCover } from '../../../Router/data/artistCover/index.js'
 
 const stopList = ['seen live', 'All', 'Listen To This']
 
@@ -17,7 +16,6 @@ export default async function (genre, session) {
   let five = 5
   for (const e of artists) {
     if (five !== 0) {
-      putCover(e.name)
       await addArtistRecomend({ artist: e.name }, session)
       five -= 1
     }
@@ -33,7 +31,6 @@ export default async function (genre, session) {
 
       if (!temp) {
         const isStop = stopList.find((a) => a === e_.name)
-
         if (
           !isStop &&
           distance(e.name, e_.name) < 0.9 &&

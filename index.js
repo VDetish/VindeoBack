@@ -41,6 +41,7 @@ import getCover from './Router/data/artistCover/index.js'
 import getMutualArtists from './Router/user/artist/get/mutual/index.js'
 
 import setUserReaction from './Router/recommendations/set/user/reaction/index.js'
+import artistAddCover from './Router/data/artist/cover/add/index.js'
 
 const port = 9001
 
@@ -97,6 +98,7 @@ const app = uWS
   .post('/user/mutualArtists', getMutualArtists)
   .get('/recommendations', getRecommendations)
   .get('/recommendations/artists', getRecommendationsArtists)
+  .post('/recommendations/artist/add/cover', artistAddCover)
   .get('/recommendations/users', getRecommendationsUsers)
   .post('/recommendations/settings', saveSearchSettings)
   .get('/topGenres', getTopGenres)

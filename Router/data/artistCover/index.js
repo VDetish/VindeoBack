@@ -47,6 +47,18 @@ export async function putCover(artist) {
   }
 }
 
+export async function saveCover({artistId, url}) {
+  let db_path = await getCover(artistId)
+
+  if (db_path.length === 0) {
+    const path = guidGenerator() + url.split('.').pop()
+
+    request(url).pipe(fs.createWriteStream(default_path + path))
+
+    await addCover({ path, artist:artistId })
+  }
+}
+
 async function emptyCovers(artists) {
   let covers = await getCovers(artists)
 
@@ -94,14 +106,9 @@ async function searchCover(artist, next) {
           try {
             const image = res.split('<meta property="og:image"')[1].split('"')[1]
             setTimeout(() => {
-              console.log(image);
               resolve(image)
             }, 300);
           } catch (error) {
-            console.log('error, wait', artist);
-            console.log(error);
-            console.log(res);
-            console.log(new URL('https://www.last.fm/music/' + artist.replaceAll(" ", "+")).toString());
             if (next) {
               return resolve({ error })
             }
