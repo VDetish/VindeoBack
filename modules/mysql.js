@@ -501,7 +501,7 @@ export async function getArtistsRecommend(session) {
   const { user } = await getSessionUser(session)
 
   const query = await connection.query(
-    'SELECT art.id, name, path FROM toolmi.users_artists_recommend AS art_rec JOIN WierdConnections.artists AS art ON art_rec.artist = art.id JOIN WierdConnections.artists_photos AS ph ON ph.artist = art_rec.artist WHERE ? ORDER BY art_rec.rate DESC',
+    'SELECT art.id, name, path FROM toolmi.users_artists_recommend AS art_rec JOIN WierdConnections.artists AS art ON art_rec.artist = art.id LEFT JOIN WierdConnections.artists_photos AS ph ON ph.artist = art_rec.artist WHERE ? GROUP BY art.id ORDER BY art_rec.rate DESC LIMIT 18',
     { 'art_rec.user': user }
   )
 

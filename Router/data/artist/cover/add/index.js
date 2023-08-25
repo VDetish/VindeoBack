@@ -31,7 +31,7 @@ export default async function (res, req) {
       cover = path
       return addCover({ path, artistId:artist })
     }
-  }).then((loool) => {
+  }).then(() => {
     sendJson(res, { session: tempSession, json: { cover } })
   })
 }
