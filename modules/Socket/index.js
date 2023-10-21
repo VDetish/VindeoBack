@@ -165,11 +165,15 @@ async function sendAll(ws, app, { text, chat, hash }) {
 
   app.publish(`chat/${chat}`, message)
 
-  await sendChatPush({
-    title: user,
-    userName: ws.client.name,
-    user,
-    body: text,
-    chat,
-  })
+  try {
+    await sendChatPush({
+      title: user,
+      userName: ws.client.name,
+      user,
+      body: text,
+      chat,
+    })
+  } catch (error) {
+    console.log('some push error', error);
+  }
 }
