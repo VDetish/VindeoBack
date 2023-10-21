@@ -100,17 +100,18 @@ export async function open(ws) {
   )
 
   for (const { id } of chatList) {
-    const unreadMessages = await getChatMessages(id, ws.session)
-
-    if (unreadMessages.length > 0) {
-      ws.send(
-        JSON.stringify({
-          type: 'background',
-          action: 'chatUnreadMessages',
-          data: unreadMessages,
-        })
-      )
-    }
+    setTimeout(async() => {
+      const unreadMessages = await getChatMessages(id, ws.session)
+      if (unreadMessages.length > 0) {
+        ws.send(
+          JSON.stringify({
+            type: 'background',
+            action: 'chatUnreadMessages',
+            data: unreadMessages,
+          })
+        )
+      }
+    }, 3000);
   }
 }
 
