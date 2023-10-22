@@ -1,4 +1,4 @@
-import { Provider, Notification } from 'apn'
+import { Provider, Notification } from '@parse/node-apn'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
@@ -15,7 +15,7 @@ const apnOptions = {
     keyId: '788WW3A73J',
     teamId: 'T5C6JZM4H5',
   },
-  production: false,
+  production: true,
 }
 
 var apnProvider = new Provider(apnOptions)
