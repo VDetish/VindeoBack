@@ -727,14 +727,17 @@ export async function userToUserChat(user) {
 export async function getContactList(session) {
   const { user } = await getSessionUser(session)
 
-  const [contactList] = await connection.query(
-    `SELECT cuu.user, CONCAT(u.name, ' ', u.family_name) AS name, MAX(p.path) AS path, u.last_seen FROM toolmi.chat_users AS cu
+  const query_format = mysql.format(
+    `SELECT cuu.user, CONCAT(u.name, ' ', u.family_name) AS name, MAX(p.path) AS path, s.update as last_seen FROM toolmi.chat_users AS cu
       JOIN toolmi.chat_users AS cuu ON cuu.chat = cu.chat
       JOIN toolmi.users AS u ON cuu.user = u.id
+      LEFT JOIN toolmi.sessions AS s ON cuu.user = s.user
       LEFT JOIN toolmi.photos AS p ON p.user = u.id AND p.sort = 1
       WHERE ? AND cuu.user != cu.user GROUP BY user`,
-    [{ 'cu.user': user }, { 'c.type': 1 }]
+    [{ 'cu.user': user }]
   )
+
+  const [contactList] = await connection.query(query_format)
 
   return contactList
 }

@@ -12,6 +12,8 @@ import { sendChatPush } from '../APN/index.js'
 
 const stringDecoder = new StringDecoder('utf8')
 
+let updateContacts = null
+
 export async function upgrade(res, req, context) {
   const upgradeAborted = { aborted: false }
   const secWebSocketKey = req.getHeader('sec-websocket-key')
@@ -57,16 +59,7 @@ function getRandomAvatarColor() {
   return colorArr[random]
 }
 
-export async function open(ws) {
-  console.log('WebSocket open, session: ' + ws.session)
-
-  ws.client = {
-    session: ws.session,
-    id: ws.userData.id,
-    name: ws.userData.name + ' ' + ws.userData.family_name,
-  }
-
-  const chatList = await getUserChats(ws.session)
+async function sendContacts(ws) {
   const contactList = await getContactList(ws.session)
 
   ws.send(
@@ -76,13 +69,27 @@ export async function open(ws) {
       data: contactList,
     })
   )
+}
+
+export async function open(ws) {
+  ws.client = {
+    session: ws.session,
+    id: ws.userData.id,
+    name: ws.userData.name + ' ' + ws.userData.family_name,
+  }
+
+  sendContacts(ws)
+  updateContacts = setInterval(() => {
+    sendContacts(ws)
+  }, 5000);
+
+  const chatList = await getUserChats(ws.session)
 
   chatList.forEach((chat) => {
     chat.color = `${colorArr[chat.color[0]]},${colorArr[chat.color[1]]}`
   })
 
   chatList.forEach(({ id }) => {
-    console.log('Подписываем', `chat/${id}`)
     ws.subscribe(`chat/${id}`)
     ws.publish(
       `chat/${id}`,
@@ -116,7 +123,7 @@ export async function open(ws) {
 }
 
 export async function close(ws, app) {
-  console.log('WebSocket closed, session: ' + ws.client.session)
+  clearInterval(updateContacts)
 
   const chatList = await getUserChats(ws.client.session)
 
@@ -144,8 +151,6 @@ export function message(ws, app, message) {
 
   // Проверять, может ли пользователь писать в чат
   // ws.client.session / ws.session
-
-  console.log('<- ' + ws.client.session + ': ' + JSON.stringify(message))
 
   switch (data.action) {
     case 'message':
