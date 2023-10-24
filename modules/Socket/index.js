@@ -12,8 +12,6 @@ import { sendChatPush } from '../APN/index.js'
 
 const stringDecoder = new StringDecoder('utf8')
 
-let updateContacts = null
-
 export async function upgrade(res, req, context) {
   const upgradeAborted = { aborted: false }
   const secWebSocketKey = req.getHeader('sec-websocket-key')
@@ -60,15 +58,22 @@ function getRandomAvatarColor() {
 }
 
 async function sendContacts(ws) {
-  const contactList = await getContactList(ws.session)
+  try {
+    const contactList = await getContactList(ws.session)
 
-  ws.send(
-    JSON.stringify({
-      type: 'foreground',
-      action: 'contactList',
-      data: contactList,
-    })
-  )
+    ws.send(
+      JSON.stringify({
+        type: 'foreground',
+        action: 'contactList',
+        data: contactList,
+      })
+    )
+  } catch (error) {
+    console.log('interval is', ws.updateContacts);
+    clearInterval(ws.updateContacts);
+    ws.updateContacts = null;
+    console.log(error);
+  }
 }
 
 export async function open(ws) {
@@ -79,7 +84,7 @@ export async function open(ws) {
   }
 
   sendContacts(ws)
-  updateContacts = setInterval(() => {
+  ws.updateContacts = setInterval(() => {
     sendContacts(ws)
   }, 5000);
 
@@ -110,20 +115,25 @@ export async function open(ws) {
     setTimeout(async() => {
       const unreadMessages = await getChatMessages(id, ws.session)
       if (unreadMessages.length > 0) {
-        ws.send(
-          JSON.stringify({
-            type: 'background',
-            action: 'chatUnreadMessages',
-            data: unreadMessages,
-          })
-        )
+        try {
+          ws.send(
+            JSON.stringify({
+              type: 'background',
+              action: 'chatUnreadMessages',
+              data: unreadMessages,
+            })
+          )  
+        } catch (error) {
+          console.log('Send Unread Messages', error);
+        }
       }
     }, 3000);
   }
 }
 
 export async function close(ws, app) {
-  clearInterval(updateContacts)
+  clearInterval(ws.updateContacts);
+  ws.updateContacts = null;
 
   const chatList = await getUserChats(ws.client.session)
 
@@ -140,7 +150,6 @@ export async function close(ws, app) {
       })
     )
   })
-
   // Получить все чаты где пользователь — отправить offline
   // Получить диалоги с пользователем — отправить offline
 }
