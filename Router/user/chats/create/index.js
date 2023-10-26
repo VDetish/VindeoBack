@@ -11,9 +11,9 @@ export default async function (res, req) {
   Promise.all([session, json])
     .then(([session, json]) => {
       tempSession = session;
-      const users = json;
+      const { users, title } = json;
 
-      return createChat(users, session);
+      return createChat({ users, title }, session);
     })
     .then((status) => {
       sendJson(res, { session: tempSession, json: { status } });

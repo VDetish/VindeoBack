@@ -841,36 +841,42 @@ export async function getChatTitle(id) {
   return res[0].name;
 }
 
-export async function createChat(data, session) {
+export async function createChat({ users, title }, session) {
   const userData = await getSessionUser(session);
 
-  if (data?.users?.length === 1) {
-    const chat = { user: userData?.user, type: 1, color: 69 };
+  if (users?.length > 0) {
+    const chat = {
+      user: userData?.user,
+      type: users?.length === 1 ? 1 : 2,
+      color: 69,
+      name: title || null,
+    };
 
     const [res] = await connection.query(
       `INSERT INTO toolmi.chats SET ?`,
       chat
     );
 
-    console.log("chat is", res.insertId);
-
-    const chats = [
-      [res?.insertId, userData?.user, 1],
-      [res?.insertId, data?.users[0], 1],
+    const mainUser = [
+      res?.insertId,
+      userData?.user,
+      users?.length === 1 ? 1 : 2,
     ];
 
-    console.log("insert users to chats", chats);
+    const addedUsers = users?.map((user) => [
+      res?.insertId,
+      user,
+      users?.length === 1 ? 1 : 2,
+    ]);
 
-    const query = await connection.query(
+    const chats = [mainUser, ...addedUsers];
+
+    await connection.query(
       `INSERT INTO toolmi.chat_users (chat, user, type) VALUES ?`,
       [chats]
     );
 
-    console.log(query);
-
     return { chatId: res.insertId };
-  } else {
-    return "Not ready";
   }
 }
 
