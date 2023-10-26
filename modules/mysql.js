@@ -745,7 +745,7 @@ export async function getContactList(session) {
       LEFT JOIN 
           toolmi.sessions AS s ON cu.id = s.user
       LEFT JOIN 
-          toolmi.photos AS p ON p.user = cu.id AND p.sort = 1
+          toolmi.photos AS p ON p.user = cu.id AND p.sort = 0
       WHERE cu.id != ?`,
     [user]
   );
