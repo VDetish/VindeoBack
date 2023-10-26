@@ -735,13 +735,19 @@ export async function getContactList(session) {
   const { user } = await getSessionUser(session);
 
   const query_format = mysql.format(
-    `SELECT cuu.user, CONCAT(u.name, ' ', u.family_name) AS name, MAX(p.path) AS path, s.update as last_seen FROM toolmi.chat_users AS cu
-      JOIN toolmi.chat_users AS cuu ON cuu.chat = cu.chat
-      JOIN toolmi.users AS u ON cuu.user = u.id
-      LEFT JOIN toolmi.sessions AS s ON cuu.user = s.user
-      LEFT JOIN toolmi.photos AS p ON p.user = u.id AND p.sort = 1
-      WHERE ? AND cuu.user != cu.user GROUP BY user`,
-    [{ "cu.user": user }]
+    `SELECT 
+      cu.id AS user,
+      CONCAT(cu.name, ' ', cu.family_name) AS name, 
+      p.path AS path, 
+      s.update AS last_seen 
+      FROM 
+          toolmi.users AS cu
+      LEFT JOIN 
+          toolmi.sessions AS s ON cu.id = s.user
+      LEFT JOIN 
+          toolmi.photos AS p ON p.user = cu.id AND p.sort = 1
+      WHERE cu.id != ?`,
+    [user]
   );
 
   const [contactList] = await connection.query(query_format);
@@ -763,7 +769,7 @@ export async function getChatMessages(chat, session) {
   const { user } = await getSessionUser(session);
   const [res] = await userChatAccess({ user, chat });
 
-  if (res.access === 0 || res.access === 1 || res.access === 2) {
+  if (res?.access === 0 || res?.access === 1 || res?.access === 2) {
     const query_format = mysql.format(
       `SELECT * FROM toolmi.chat_messages WHERE ? AND id > ? ORDER BY time DESC LIMIT 100`,
       [{ chat }, res.last_message]

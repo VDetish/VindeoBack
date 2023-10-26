@@ -104,7 +104,7 @@ async function sendChats(ws) {
   for (const { id } of chatList) {
     setTimeout(async () => {
       const unreadMessages = await getChatMessages(id, ws.session);
-      if (unreadMessages.length > 0) {
+      if (unreadMessages?.length > 0) {
         try {
           ws.send(
             JSON.stringify({
@@ -129,11 +129,12 @@ export async function open(ws) {
   };
 
   sendContacts(ws);
+  sendChats(ws);
+
   ws.updateContacts = setInterval(() => {
     sendContacts(ws);
+    sendChats(ws);
   }, 5000);
-
-  sendChats(ws);
 }
 
 export async function close(ws, app) {
