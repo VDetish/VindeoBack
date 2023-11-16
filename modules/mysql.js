@@ -771,7 +771,7 @@ export async function getChatMessages(chat, session) {
 
   if (res?.access === 0 || res?.access === 1 || res?.access === 2) {
     const query_format = mysql.format(
-      `SELECT * FROM toolmi.chat_messages WHERE ? AND id > ? ORDER BY time DESC LIMIT 100`,
+      `SELECT * FROM toolmi.chat_messages WHERE ? AND id > ? ORDER BY time DESC LIMIT 1000`,
       [{ chat }, res.last_message]
     );
 

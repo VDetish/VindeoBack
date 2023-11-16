@@ -26,11 +26,11 @@ export async function upgrade(res, req, context) {
     return;
   }
 
-  const { value, user } = await getSessionUser(session);
-  const userData = await getUser(user);
+  const sessionData = await getSessionUser(session);
+  const userData = await getUser(sessionData?.user);
 
   res.upgrade(
-    { userData: { ...userData }, session: value },
+    { userData: { ...userData }, session: sessionData?.value },
     secWebSocketKey,
     session,
     secWebSocketExtensions,
@@ -51,12 +51,6 @@ const colorArr = [
   "#b3a0e8",
 ];
 
-function getRandomAvatarColor() {
-  const random = Math.floor(Math.random() * colorArr.length);
-
-  return colorArr[random];
-}
-
 async function sendContacts(ws) {
   try {
     const contactList = await getContactList(ws.session);
@@ -76,7 +70,7 @@ async function sendContacts(ws) {
   }
 }
 
-async function sendChats(ws) {
+async function sendChats(ws, withMessages) {
   const chatList = await getUserChats(ws.session);
 
   chatList.forEach((chat) => {
@@ -101,23 +95,26 @@ async function sendChats(ws) {
     JSON.stringify({ type: "foreground", action: "chatList", data: chatList })
   );
 
-  for (const { id } of chatList) {
-    setTimeout(async () => {
-      const unreadMessages = await getChatMessages(id, ws.session);
-      if (unreadMessages?.length > 0) {
-        try {
-          ws.send(
-            JSON.stringify({
-              type: "background",
-              action: "chatUnreadMessages",
-              data: unreadMessages,
-            })
-          );
-        } catch (error) {
-          console.log("Send Unread Messages", error);
+  // Отправлять только при коннекте
+  if (withMessages) {
+    for (const { id } of chatList) {
+      setTimeout(async () => {
+        const unreadMessages = await getChatMessages(id, ws.session);
+        if (unreadMessages?.length > 0) {
+          try {
+            ws.send(
+              JSON.stringify({
+                type: "background",
+                action: "chatUnreadMessages",
+                data: unreadMessages,
+              })
+            );
+          } catch (error) {
+            console.log("Send Unread Messages", error);
+          }
         }
-      }
-    }, 3000);
+      }, 3000);
+    }
   }
 }
 
@@ -129,7 +126,7 @@ export async function open(ws) {
   };
 
   sendContacts(ws);
-  sendChats(ws);
+  sendChats(ws, true);
 
   ws.updateContacts = setInterval(() => {
     sendContacts(ws);
@@ -177,7 +174,6 @@ export function message(ws, app, message) {
 }
 
 async function sendAll(ws, app, { text, chat, hash }) {
-  console.log("sendAll");
   const { id, user, time } = await addMessage({ chat, hash, text }, ws.session);
 
   const message = JSON.stringify({
