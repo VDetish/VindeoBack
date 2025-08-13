@@ -3,6 +3,11 @@ import fs from "fs";
 
 import { upgrade, open, close, message } from "./modules/Socket/index.js";
 
+import getFeed from "./Router/recommendations/get/feed/index.js";
+import postFeedEvent from "./Router/recommendations/set/feedEvent/index.js";
+import getListingMediaRoute from "./Router/listings/media/get/index.js";
+
+
 import device from "./Router/device/index.js";
 import sendCode from "./Router/code/send/index.js";
 import checkCode from "./Router/code/check/index.js";
@@ -43,7 +48,7 @@ import getMutualArtists from "./Router/user/artist/get/mutual/index.js";
 import setUserReaction from "./Router/recommendations/set/user/reaction/index.js";
 import artistAddCover from "./Router/data/artist/cover/add/index.js";
 
-const port = 9001;
+const port = 9002;
 
 // Send sms
 var accountSid = "AC64664f594eceb830a09387f980e2a520"; // Your Account SID from www.twilio.com/console
@@ -170,6 +175,9 @@ const app = uWS
   .post("/addArtist", addArtist)
   .post("/addArtists", addArtists)
   .post("/chats/create", createChat)
+  .get("/feed", getFeed)
+  .post("/feed/event", postFeedEvent)
+  .get("/listing/media/:id", getListingMediaRoute)
   .listen(port, (token) => {
     if (token) {
       console.log("Listening to port " + port);

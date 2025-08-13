@@ -2,9 +2,9 @@
 #
 .DS_Store
 
-#temp/*
+temp/*
 #certs/*
-Content/*
+public/*
 
 # node.js
 #
