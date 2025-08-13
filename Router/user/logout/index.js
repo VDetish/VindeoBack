@@ -1,5 +1,5 @@
 import Session from '../../../Session/index.js'
-import { sendJson } from '../../../Utils/index.js'
+import { sendJson } from '../../../utils/index.js'
 import { updateSession } from '../../../modules/mysql.js'
 
 export default async function (res, req) {

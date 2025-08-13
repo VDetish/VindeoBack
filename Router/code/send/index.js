@@ -1,5 +1,5 @@
 import Session from '../../../Session/index.js'
-import { readJson, sendJson } from '../../../Utils/index.js'
+import { readJson, sendJson } from '../../../utils/index.js'
 import { makeCall } from '../../../modules/PhoneVerification.js'
 import { addCall } from '../../../modules/mysql.js'
 

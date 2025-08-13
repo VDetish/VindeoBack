@@ -1,7 +1,7 @@
 import moment from 'moment'
 
 import Session from '../../../../Session/index.js'
-import { sendJson } from '../../../../Utils/index.js'
+import { sendJson } from '../../../../utils/index.js'
 import { getCities } from '../../../../modules/VK/index.js'
 import { getUsersRecomendations } from '../../../../modules/mysql.js'
 

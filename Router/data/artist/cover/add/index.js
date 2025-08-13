@@ -2,7 +2,7 @@ import request from 'request'
 import fs from 'fs'
 
 import Session from '../../../../../Session/index.js'
-import { readJson, sendJson } from '../../../../../Utils/index.js'
+import { readJson, sendJson } from '../../../../../utils/index.js'
 import { getCover, addCover } from '../../../../../modules/mysql.js'
 
 const default_path = 'Content/Covers/'

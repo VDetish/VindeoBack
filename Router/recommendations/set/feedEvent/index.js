@@ -1,32 +1,46 @@
-import Session from '../../../../Session/index.js'
-import { readJson, sendJson } from "../../../../Utils/index.js";
+// Router/recommendations/set/feedEvent/index.js
+import Session from "../../../../Session/index.js";
+import { readJson, sendJson } from "../../../../utils/index.js";
 import { getSessionUser, recordFeedEvent } from "../../../../modules/mysql.js";
 
 export default async function (res, req) {
-  let sessionPromise = Session(res, req);
-  let bodyPromise = readJson(res);
-  let tempSession = null;
+  let sessionPromise = Session(res, req);    // вешаем onAborted
+  let bodyPromise = readJson(res);           // твой парсер тела
+  let sess = null;
 
   Promise.all([sessionPromise, bodyPromise])
     .then(async ([session, json]) => {
-      tempSession = session;
+      sess = session;
+      if (res.aborted) return;
+
       const { user } = await getSessionUser(session);
       if (!user) {
-        sendJson(res, { session: tempSession, json: { ok: false, error: "no user" }, status: 401 });
-        return;
+        return sendJson(res, {
+          session: sess,
+          status: 401,
+          json: { ok: false, error: "no user" },
+        });
       }
 
       const { listingId, ev, dwellMs } = json || {};
       if (!listingId || !ev) {
-        sendJson(res, { session: tempSession, json: { ok: false, error: "listingId & ev required" }, status: 400 });
-        return;
+        return sendJson(res, {
+          session: sess,
+          status: 400,
+          json: { ok: false, error: "listingId & ev required" },
+        });
       }
 
       await recordFeedEvent({ userId: user, listingId, ev, dwellMs });
-      sendJson(res, { session: tempSession, json: { ok: true } });
+      return sendJson(res, { session: sess, json: { ok: true } });
     })
-    .catch(err => {
-      console.error(err);
-      sendJson(res, { session: tempSession, json: { ok: false, error: "event error" }, status: 500 });
+    .catch((err) => {
+      console.error("event error", err);
+      if (res.aborted) return;
+      sendJson(res, {
+        session: sess,
+        status: 500,
+        json: { ok: false, error: "event error" },
+      });
     });
 }

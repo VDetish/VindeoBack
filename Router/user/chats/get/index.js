@@ -1,5 +1,5 @@
 import Session from '../../../../Session/index.js'
-import { sendJson } from '../../../../Utils/index.js'
+import { sendJson } from '../../../../utils/index.js'
 // import { getPhotos } from '../../../../modules/mysql.js'
 
 const chatList = [

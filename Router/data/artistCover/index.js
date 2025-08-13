@@ -3,7 +3,7 @@ import fs from 'fs'
 import querystring from 'querystring'
 
 import { get } from '../../../Network/Fetch/index.js'
-import { sendJson } from '../../../Utils/index.js'
+import { sendJson } from '../../../utils/index.js'
 
 import { getCover, getCovers, addCover } from '../../../modules/mysql.js'
 

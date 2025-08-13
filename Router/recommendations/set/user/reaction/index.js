@@ -1,5 +1,5 @@
 import Session from '../../../../../Session/index.js'
-import { readJson, sendJson } from '../../../../../Utils/index.js'
+import { readJson, sendJson } from '../../../../../utils/index.js'
 import { setUsersReaction } from '../../../../../modules/mysql.js'
 
 export default async function (res, req) {

@@ -1,7 +1,7 @@
 import Session from '../../../../Session/index.js'
-import { SaveFile } from '../../../../Utils/UploadFile/index.js'
+import { SaveFile } from '../../../../utils/UploadFile/index.js'
 import { addPhoto } from '../../../../modules/mysql.js'
-import { sendJson } from '../../../../Utils/index.js'
+import { sendJson } from '../../../../utils/index.js'
 
 export default async function (res, req) {
   let session = Session(res, req)

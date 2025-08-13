@@ -1,6 +1,6 @@
 import Session from '../../../../Session/index.js'
 import { addInterest } from '../../../../modules/mysql.js'
-import { readJson, sendJson } from '../../../../Utils/index.js'
+import { readJson, sendJson } from '../../../../utils/index.js'
 
 import similarGenres from '../../../data/similarGenre/index.js'
 

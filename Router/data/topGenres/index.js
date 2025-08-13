@@ -1,5 +1,5 @@
 import { query } from '../../../Network/Fetch/index.js'
-import { sendJson } from '../../../Utils/index.js'
+import { sendJson } from '../../../utils/index.js'
 
 export default async function (res, req) {
   res.onAborted(() => {

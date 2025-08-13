@@ -1,6 +1,6 @@
 import Session from '../../../../../Session/index.js'
 import { addInstagramPhotos } from '../../../../../modules/mysql.js'
-import { readJson, sendJson } from '../../../../../Utils/index.js'
+import { readJson, sendJson } from '../../../../../utils/index.js'
 
 export default async function (res, req) {
   let session = Session(res, req)
