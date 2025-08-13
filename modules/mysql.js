@@ -895,6 +895,9 @@ export async function createChat({ users, title }, session) {
 
 /** Записать событие фида и, если нужно, подправить аффинити */
 export async function recordFeedEvent({ userId, listingId, ev, dwellMs }) {
+  console.log('{ userId, listingId, ev, dwellMs }', { userId, listingId, ev, dwellMs });
+  
+
   // 1) пишем событие
   await connection.query(
     "INSERT INTO Vindeo.feed_events SET ?",
